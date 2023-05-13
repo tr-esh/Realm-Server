@@ -1,0 +1,87 @@
+.monthly-record-holder{
+    padding-top: 1rem;
+    margin: 0 3rem;
+    height: 10.5vh;
+    width: 55vw;
+    
+}
+.monthly-record-holder::-webkit-scrollbar {
+    display: none;
+}
+
+  .slick-track {
+    display: flex; /* use flexbox to show all slides in a single row */
+    align-items: center; /* center the slides vertically */
+  }
+
+.slick-slide {
+    margin: 0 10px; /* add a 10px margin on both sides of each slide */
+  }
+
+.monthly-logs{
+    background-color: #10273d;
+    border: none;
+    width: 4rem;
+    height: 32vh;
+    font-family: 'Poppins';
+    border-radius: 3rem;
+    text-align: left;
+    padding-left: 2rem; 
+    margin-bottom: 1rem;
+    margin-right: 6rem;
+}
+.reading-count{
+    color: #EBEBE8;
+    font-size: 1.5rem;
+}
+.reading-count > .active-param {
+    color: #76B947;
+}
+
+.no-readings{
+    color:#2a557c;
+}
+.monthly-logs:hover{
+    background-color: #132e47;
+    box-shadow: inset 1px 1px #5090D3;
+    cursor: pointer;
+}
+
+.monthly-logs:disabled:hover {
+    background-color: #b4b4b4;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.monthly-logs:hover .logs{
+    color: #5090D3;
+}
+
+.monthly-logs:disabled:hover .logs {
+    color: #8f8f8f;
+}
+
+.monthly-logs:hover .icon{
+    color: #5090D3;
+}
+
+.monthly-logs:disabled:hover .icon {
+    color: #8f8f8f;
+}
+
+.months{
+    align-items: center;
+    display: flex;
+}
+
+.month{
+    color: #ffff; 
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+.logs{
+     color:#66B2FF;
+     font-size: 1.5rem;
+}
+
+    

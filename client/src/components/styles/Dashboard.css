@@ -1,0 +1,111 @@
+.Dashboard {
+    margin: 6rem 4rem;
+}
+
+.welcome-statement {
+    padding-top: 1rem;
+    padding-left: 2rem;
+    padding-bottom: 1.5rem;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: start;
+}
+
+.Typography {
+    font-family: 'Poppins', sans-serif;
+}
+
+.Status {
+    display: flex;
+}
+
+.headings {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.dataTemp>span {
+    font-size: 1.3rem;
+    margin-right: 2rem;
+    padding-left: 1rem;
+}
+
+.dataPH>span {
+    font-size: 1.3rem;
+}
+
+.dataTurbid>span {
+    font-size: 1.3rem;
+}
+.Tempstamp>span {
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
+.phtamp>span {
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
+.turbidstamp>span {
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
+
+.Header {
+    display: flex;
+    text-align: left;
+    gap: 1rem;
+    margin-top: 5rem;
+}
+
+.TopCon {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.table-holder{
+    border-top-left-radius: 13.5px;
+    border-top-right-radius: 13.5px;
+    height: 150px;
+    overflow-y: scroll;
+}
+
+.table-holder::-webkit-scrollbar {
+    display: none;
+}
+
+.CircularProgressbar {
+    padding-left: 1rem;
+    height: 12rem;
+}
+
+.CircularProgressbar-trail {
+    display: none;
+}
+
+.solid{
+    border-top: 3px solid #7da4cc;
+    position: absolute;
+  }
+
+
+@media screen and (max-width: 1200px ) {
+    .item{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .Grid>.card{
+        height: 14rem;
+        width: 20rem;
+    }
+
+    
+}
+
+.mainCon{
+    width: 40vw;
+}

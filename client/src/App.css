@@ -1,0 +1,35 @@
+
+
+:root {
+  --glass: rgb(96,228,222);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.App {
+  background-color: #0d2135;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+.AppGlass {
+  display: grid;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  grid-template-columns: 24rem auto;
+}
+
+@media screen and (max-width: 1200px ) {
+
+  .AppGlass {
+    grid-template-columns: 18rem auto;
+    overflow-y: scroll;
+  }
+}

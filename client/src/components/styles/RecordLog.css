@@ -1,0 +1,74 @@
+.RecordLogs {
+    display: grid;
+    height: 100%;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    grid-template-columns: 73rem auto;
+}
+
+.left {
+    flex-direction: row;
+    gap: 1.5rem;
+}
+
+.headname {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    padding: 0.5rem 1rem;
+}
+
+.headname > * {
+    font-size: 4rem;
+    font-weight: 700;
+}
+
+.right > *{
+    padding: 0.5rem 0;
+    align-self: baseline;
+}
+
+.right-contents {
+    display: flex;
+}
+
+.date {
+    background-color: #7da4cc;
+    color: white;
+    font-size: 1rem;
+    width: 35vh;
+    height: 5vh;
+    border-radius: 0.75rem;
+    line-height: 3;
+    
+    
+}
+
+.calendar_icn {
+    padding-left: 1rem;
+
+}
+
+.separator{
+    margin-top: 2.3rem;
+    width: 0.1vw;
+    height: 7vh;
+    background: #7da4cc;
+  }
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.results{
+    border-top-left-radius: 13.5px;
+    border-top-right-radius: 13.5px;
+    height: 450px;
+    overflow-y: scroll;
+}
+
+.results::-webkit-scrollbar {
+    display: none;
+}
