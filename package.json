@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/tr-esh/Realm-Server#readme",
   "dependencies": {
+    "path": "^0.12.7",
     "typescript": "^5.0.4"
   }
 }

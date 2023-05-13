@@ -7,6 +7,7 @@ const cors = require('cors')
 const parameterRoutes = require('./routes/parameters')
 const os = require('os');
 const interfaces = os.networkInterfaces();
+const path = require('path');
 let ip_address;
 
 for (let k in interfaces) {
@@ -39,6 +40,10 @@ app.use(require("./routes/parameters"))
 //routes
 app.use('/api/realm', parameterRoutes)
 
+
+
+const rootDirectory = path.join(__dirname);
+console.log(rootDirectory);
 
 
 //setup mongoose connection ZSt6kE8TzgVq92jt
