@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/tr-esh/Realm-Server/issues"
   },
-  "homepage": "https://github.com/tr-esh/Realm-Server#readme"
+  "homepage": "https://github.com/tr-esh/Realm-Server#readme",
+  "dependencies": {
+    "typescript": "^5.0.4"
+  }
 }
