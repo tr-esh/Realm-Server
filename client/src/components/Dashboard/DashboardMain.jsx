@@ -124,7 +124,7 @@ const DashboardMain = () => {
     };
 
     fetchData();
-  }, []);
+  }, [readings]);
 
   //save for later
       // useEffect(() => {

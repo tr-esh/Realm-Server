@@ -41,9 +41,16 @@ app.use(require("./routes/parameters"))
 app.use('/api/realm', parameterRoutes)
 
 
-
 const rootDirectory = path.join(__dirname);
 console.log(rootDirectory);
+
+//server client
+app.use(express.static(path.join(__dirname, "../client/build")));
+app.get("*", (req, res) =>
+    res.sendFile(
+        path.resolve(__dirname, "../", "client", "build", "index.html")
+    )
+);
 
 
 //setup mongoose connection ZSt6kE8TzgVq92jt
