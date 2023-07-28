@@ -197,7 +197,7 @@ const AnalyticMain = () => {
         </Grid>
 
         <Grid xs={6} md={8}>
-          <Item style={{  height: '22rem', background: 'rgb(13,33,53)', background: 'linear-gradient(0deg, rgba(13,33,53,1) 0%, rgba(138,109,193,1) 100%)', marginTop: '1.5rem'}}>
+          <Item style={{  height: '22rem', background: 'linear-gradient(0deg, rgba(13,33,53,1) 0%, rgba(138,109,193,1) 100%)', marginTop: '1.5rem'}}>
             <div className='header-holder'>
               <p style={{fontSize:'0.8rem', textAlign: 'left', paddingLeft: '1.5rem', paddingTop: '1.5rem'}}> WATER QUALITY FORECAST </p>
               
