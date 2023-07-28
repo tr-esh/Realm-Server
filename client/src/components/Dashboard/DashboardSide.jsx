@@ -89,7 +89,7 @@ const DashboardSide = () => {
 
     fetchData()
 
-  }, [all])
+  }, [])
 
   const handleModalOpen = (alertType) => {
     // filter the `all` array based on the clicked alert type
