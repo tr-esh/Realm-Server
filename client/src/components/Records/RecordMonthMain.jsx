@@ -58,24 +58,20 @@ const Item = styled(Paper)(({ theme }) => ({
                      phlevel: 'PH LEVEL'}
 
   const [showTable, setShowTable] = useState(false);
-  const [activeButtons, setActiveButtons] = useState('');
+  const [activeButtonsIndex, setActiveButtonsIndex] = useState('');
   const [data, setData] = useState('');
   const [type, setType] = useState('');
   const [params, setParams] = useState('');
-  const [selectedButton, setSelectedButton] = useState('');
+  const [selectedButton, setSelectedButton] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   
   
 
-  const handleClick = ( value, newData, newType, buttonName, buttonIndex) => {
-    setActiveButtons(prevState => {
-      const newState = [...prevState];
-      newState[buttonIndex] = !prevState[buttonIndex];
-      return newState;
-    });
+  const handleClick = ( index, value, newData, newType, buttonName) => {
+    setActiveButtonsIndex(index);
     setParams({ ...params, [newData]: value });
-    setShowTable(!showTable);
+    setShowTable(true);
     setData(newData);
     setType(newType);
     setSelectedButton(buttonName);
@@ -335,8 +331,8 @@ const Item = styled(Paper)(({ theme }) => ({
           
                 <div className='parameter-holder' style={{marginTop:'-5rem'}}> 
                 <Item> 
-                    <button onClick={() => {handleClick(0); handleClick( params.temperature, 'DS18B209', 'temperature', 'tempcolor');}} 
-                        className={`param-container ${activeButtons[0] ? 'active' : ''}`} > 
+                    <button onClick={() => handleClick( 0, params.temperature, 'DS18B209', 'temperature', 'tempcolor')}
+                        className={`param-container ${activeButtonsIndex === 0 ? 'active' : ''}`} > 
                           <span className='icons-holder' style={{backgroundColor:'#8A6DC1'}}> 
                             <OpacityRoundedIcon className='water-icon' sx={{ fontSize: 30, color:'#8A6DC1', paddingTop:'0.8rem'}}/> 
                             </span>
@@ -349,8 +345,8 @@ const Item = styled(Paper)(({ theme }) => ({
                         {filteredData.filter((item) => item.type === 'temperature').length} results  </span>
                     </button>
 
-                    <button onClick={() => {handleClick(1); handleClick( params.turbidity, 'SEN0189', 'turbidity', 'ntucolor');}} 
-                        className={`param-container ${activeButtons[1] ? 'active' : ''}`} > 
+                    <button onClick={() => handleClick(1, params.turbidity, 'SEN0189', 'turbidity', 'ntucolor')}
+                        className={`param-container ${activeButtonsIndex === 1 ? 'active' : ''}`} > 
                           <span className='icons-holder' style={{backgroundColor:'#F1918F'}}> 
                             <OpacityRoundedIcon className='water-icon' sx={{ fontSize: 30, color:'#F1918F', paddingTop:'0.8rem'}}/> 
                             </span>
@@ -362,8 +358,8 @@ const Item = styled(Paper)(({ theme }) => ({
                     </button>
 
 
-                    <button onClick={() => {handleClick(2); handleClick( params.phlevel, 'PH-4502C', 'pH', 'pHcolor');}} 
-                         className={`param-container ${activeButtons[2] ? 'active' : ''}`}> 
+                    <button onClick={() => handleClick(2, params.phlevel, 'PH-4502C', 'pH', 'pHcolor')}
+                         className={`param-container ${activeButtonsIndex === 2 ? 'active' : ''}`}> 
                           <span className='icons-holder' style={{backgroundColor:'#F5D087'}}> 
                             <OpacityRoundedIcon className='water-icon' sx={{ fontSize: 30, color:'#F5D087', paddingTop:'0.8rem'}}/> 
                             </span>

@@ -25,8 +25,6 @@ import { Bar } from 'react-chartjs-2';
 
 
 
-
-
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1e88e5' : '#10273d',
     ...theme.typography.body2,
@@ -67,37 +65,11 @@ const DashboardMain = () => {
   const [phLevel, setPhLevel] = useState([])
   const [turbidity, setTurbidity] = useState([])
   const [readings, setReadings]= useState([])
-  const [bardata, setBarData]= useState()
   const [isLoading, setIsLoading] = useState(true);
+  const [frequencyData, setFrequencyData] = useState([]);
   
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const [res1, res2, res3] = await Promise.all([
-  //       fetch('/api/realm/fetchtemp'),
-  //       fetch('/api/realm/fetchntu'),
-  //       fetch('/api/realm/fetchph'),
-        
-  //     ]);
-      
 
-  //     const json1 = await res1.json()
-  //     const json2 = await res2.json()
-  //     const json3 = await res3.json()
-
-      
-  //     if (res1.ok){
-  //       setTemperature(json1);
-  //     }
-  //     if (res2.ok){
-  //       setTurbidity(json2);
-  //     }
-  //     if (res3.ok){
-  //       setPhLevel(json3);  
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
 
 
   useEffect(() => {
@@ -119,72 +91,23 @@ const DashboardMain = () => {
             setIsLoading(false)
           }
           if (res2.ok){
-            setBarData(json2);
+            setFrequencyData(json2);
           }
     };
 
     fetchData();
-  }, [readings]);
-
-  //save for later
-      // useEffect(() => {
-      //   const fetchData = async () => {
-      //     const response = await fetch('/api/realm/fetchParameters')
-      //     const json = await response.json()
-
-      //     if (response.ok) {
-      //      setAllData(json)
-      //     }
-      //   }
+  }, []);
 
 
-      //   fetchData()
 
-      // }, [])
-
-
-      // try {
-      //   const response = await fetch('/api/realm/fetchParameters');
-      //   const data = await response.json();
-      //   const filteredData = data.filter(reading => reading.ntu_value !== null);
-      //   setReadings(filteredData);
-      // } catch (error) {
-      //   console.error(error);
-      // }
-      
-      
-
-      //   const data = {
-      //     labels: ['Hour 1', 'Hour 2', 'Hour 3', 'Hour 4', 'Hour 5'],
-      //     datasets: [
-      //       {
-      //         label: 'Temperature',
-      //         backgroundColor: 'rgba(75,192,192,1)',
-      //         borderColor: 'rgba(0,0,0,1)',
-      //         borderWidth: 1,
-      //         data: [
-      //           bardata ? bardata.temperature_value : 0,
-      //           bardata ? bardata.ntu_value : 0,
-      //           bardata ? bardata.ph_value : 0,
-      //         ]
-      //       },
-      //     ],
-      //   };
-    
-      // const options = {
-      //   responsive: true,
-      //   plugins: {
-      //     legend: {
-      //       position: 'top',
-      //     },
-      //     title: {
-      //       display: true,
-      //       text: 'Bargraph',
-      //     },
-      //   },
-      // };
   
-      const graphIllustration = new URL('../../img/graph_illustration.png', import.meta.url)
+  
+const graphIllustration = new URL('../../img/graph_illustration.png', import.meta.url)
+const bucketIcon = new URL('../../img/icons8-whitebucket-96.png', import.meta.url)
+const filterIcon = new URL('../../img/icons8-whitefilter-96.png', import.meta.url)
+const kettleIcon = new URL('../../img/icons8-whiteteapot-96.png', import.meta.url)
+
+
 
 
   return (
@@ -245,12 +168,80 @@ const DashboardMain = () => {
               <Item style={{  height: '14rem'  }}>
                 <CardContent className="Recents"  
                     style={{ padding: '1rem 2rem' }}>
-                    <div className="Header" >
-                  
-                     </div>
+                    
+                    <div className="Insight" >
+                      <p className='Headline'
+                      style={{fontFamily: 'Inter', 
+                              fontSize: '0.8rem',
+                              textAlign: 'left', 
+                              fontWeight: '200'}}> 
+                       Suggestions for you today 
+                      </p>
+                      
+                      <div className='Suggestions'
+                      style={{display: 'flex', 
+                              flexDirection: 'row'}}>
+                        
+                        <div className='leftSuggestions'
+                        style={{display: 'flex', 
+                                flexDirection: 'column'}}>
+                            <div style={{width: '13rem', height: '5rem', marginTop: '0.5rem'}}> 
+                              <div style={{padding:'1rem', display: 'flex'}}>
+                                <div style={{backgroundColor:'#122B44', width: '3.5rem', borderRadius: '1.2rem', height:'3.2rem', display: 'flex', alignItems:'center', justifyContent:'center'}}>
+                                  <img style={{width: '1.5rem'}} src={bucketIcon} alt="bucket" /> 
+                            </div>
+                                 <div style={{marginLeft:'0.9rem', lineHeight:'1', margin: 'auto', textAlign: 'left'}}> 
+                                    <p> Fetch </p>
+                                    <p1 style={{fontSize:'0.8rem', fontFamily:'Inter', fontWeight:'400'}}> Allowed </p1>
+                                  </div>
+                              </div> 
+                        </div>
+                            
+                            <div 
+                            style={{width: '13rem', 
+                                    height: '5rem', 
+                                    marginTop: '0.5rem'}}> 
+                            <div style={{padding:'1rem', display: 'flex'}}>
+                              <div style={{backgroundColor:'#122B44', width: '3.5rem', borderRadius: '1.2rem', height:'3.2rem', display: 'flex', alignItems:'center', justifyContent:'center'}}>
+                                <img style={{width: '1.5rem'}} src={filterIcon} alt="bucket" /> 
+                            </div>
+                                    <div style={{marginLeft:'0.9rem', lineHeight:'1', margin: 'auto', textAlign: 'left'}}> 
+                                        <p> Filtration </p>
+                                        <p1 style={{fontSize:'0.8rem', fontFamily:'Inter', fontWeight:'400'}}> Likely needed </p1>
+                                   </div>
+                                </div> 
+                              </div>
+                          </div>
+                        
+                        <div className='rightSuggestions'
+                           style={{display: 'flex', 
+                                   flexDirection: 'column', 
+                                   marginLeft: '1rem'}}>
+                            <div style={{width: '13rem', height: '5rem', marginTop: '0.5rem'}}> 
+                                <div style={{padding:'1rem', display: 'flex'}}>
+                                  <div style={{backgroundColor:'#122B44', width: '3.5rem', borderRadius: '1.2rem', height:'3.2rem', display: 'flex', alignItems:'center', justifyContent:'center'}}>
+                                    <img style={{width: '1.5rem'}} src={kettleIcon} alt="bucket" /> 
+                            </div>
+                                  <div style={{marginLeft:'0.9rem', lineHeight:'1', margin: 'auto', textAlign: 'left'}}> 
+                                    <p> Distillation </p>
+                                      <p1 style={{fontSize:'0.8rem', fontFamily:'Inter', fontWeight:'400'}}> Likely needed </p1>
+                                  </div>
+                            </div> 
+                        </div>
+                            
+                            <div 
+                            style={{width: '13rem', 
+                                    height: '5rem', 
+                                    marginTop: '0.8rem'}}> 
+                            </div>
+                        </div>
+                      </div>
+                    </div>
                 </CardContent>
               </Item>
             </Grid>
+
+            
 
             <Grid xs={6} md={4} 
             item className="card">
@@ -299,7 +290,7 @@ const DashboardMain = () => {
                         <span key={readings.id} 
                               style={{color: readings.status[0] === "Normal" ? "#bedaff" : 
                                               readings.status[0] === "Conditional" ? "#f0de53" : 
-                                              readings.status[0] === "Warning: Rising Temperature" ? "#d32f2f" : "white",
+                                              readings.status[0] === "Warning: Rising Temperature" ? "#FF6384" : "white",
                                               fontSize:'0.9rem'}}>
                             {readings.status[0]}
                         </span>
@@ -353,7 +344,7 @@ const DashboardMain = () => {
                             <span key={turbidity.id}
                                   style={{color:turbidity.status[1] === "Normal" ? "#bedaff" : 
                                                 turbidity.status[1] === "Conditional" ? "#f0de53" : 
-                                                turbidity.status[1] === "Warning: High Turbid" ? "#d32f2f" : "white",
+                                                turbidity.status[1] === "Warning: High Turbid" ? "#FF6384" : "white",
                                                 fontSize:'0.95rem'}}>
                                 {turbidity.status[1]}
                             </span>
@@ -415,46 +406,77 @@ const DashboardMain = () => {
               ))}
             </Grid>
 
-            <Grid xs={6} md={8}
+            <Grid xs={6} md={7}
             item className="card">
               <Item style={{  height: '15rem' }}> 
-              {/* {bardata ? (
-                  <Bar data={data} options={options} style={{  width: '75%' }} />
-                ) : (
-                  <p>Loading...</p>
-                )} */}
-                { bardata && bardata.length > 0 ? (
-                    <div>
-                      <Bar data={bardata} />
-                    </div>
-                  ) : (
-                    <img style={{width:'20rem', display:'block', margin:'auto'}} src={graphIllustration} alt="No data available" />
-                  )}
-              {/* {bardata && (
-                      <Bar
-                        data={data}
-                        options={{
-                          title: {
-                            display: true,
-                            text: 'High Parameter Values',
-                            fontSize: 20,
-                          },
-                          legend: {
-                            display: false,
-                          },
-                        }}
-                      />
-                    )} */}
+
+                    <div style={{ maxWidth: '500px', margin: '0 auto'}}>
+                          {frequencyData ? (
+                            <Bar
+                              data={{
+                                labels: frequencyData.map((data) => data.day),
+                                datasets: [
+                                  {
+                                    label: 'Temperature',
+                                    data: frequencyData.map((data) => data.temperature),
+                                    backgroundColor: '#4E79B4',
+                                    borderRadius: 5,
+                                  },
+                                  {
+                                    label: 'Turbidity',
+                                    data: frequencyData.map((data) => data.turbidity),
+                                    backgroundColor: '#6F93D3',
+                                    borderRadius: 5,
+                                  },
+                                  {
+                                    label: 'pH',
+                                    data: frequencyData.map((data) => data.pH),
+                                    backgroundColor: '#9FB9DD',
+                                    borderRadius: 5,
+                                  },
+                                ],
+                              }}
+                              options={{
+                                title: {
+                                  display: true,
+                                  text: 'Weekly High Parameter Frequency',
+                                  fontSize: 20,
+                                },
+                                legend: {
+                                  display: true,
+                                },
+                                scales: {
+                                  x: {
+                                    stacked: false,
+                                    barPercentage: 0.7,
+                                  },
+                                  y: {
+                                    display: false, // Remove the y-axis label
+                                    beginAtZero: true,
+                                    stacked: false,
+                                    grid: {
+                                      display: false, // Remove gridlines
+                                    },
+                                  },
+                                },
+                                barThickness: 20, // Set the desired width of the bars (in pixels)
+                                categoryPercentage: 1.0, // Set the width of the bars relative to the available space
+                              }}
+                            />
+                          ) : (
+                            <img style={{width:'20rem', display:'block', margin:'auto'}} src={graphIllustration} alt="No data available" />
+                          )}
+                        </div>
               </Item>
               </Grid>
               
-              <Grid xs={6} md={4}
+              <Grid xs={6} md={5}
               item className="card">
                  <Item style={{  height: '15rem' }} >
                   <CardContent style={{padding: '1.25rem 1.5rem'}}>
                     <div className="upperCon"
-                      style={{ display: 'flex', gap: '8.4rem', marginTop: '-1.6rem', marginLeft: '-2rem',
-                                  width: '300px', height: '60px',
+                      style={{ display: 'flex', gap: '14rem', marginTop: '-1.6rem', marginLeft: '-2rem',
+                                  width: '388px', height: '60px',
                                   flexDirection: 'row', padding: '0 2ch',backgroundColor: '#66B2FF', 
                                   borderTopLeftRadius: '1.6rem', borderTopRightRadius: '1.6rem',
                                   alignItems:'center'}}>
@@ -487,7 +509,7 @@ const DashboardMain = () => {
                         
                       </div>
                       
-                      <div className="right" style={{ marginTop: '1rem', paddingLeft: '1.5rem'}}>
+                      <div className="right" style={{ marginTop: '1rem', paddingLeft: '6rem'}}>
                           <DashClock/>
                       </div>
                   </div>
