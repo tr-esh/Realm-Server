@@ -49,7 +49,7 @@ const MonthLogs = () => {
  
 
   
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState('');
   
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -129,6 +129,7 @@ const MonthLogs = () => {
   }, []);
 
 
+  let sharedFilteredData = [];
   
   const handleMonthClick = async (month, event) => {
     const response = await fetch(`/api/realm/monthdata`);
@@ -140,25 +141,39 @@ const MonthLogs = () => {
       (param) =>
         new Date(param.createdAt).toLocaleString("en-PH", { month: "long" }).toUpperCase() === month.name
     );
+
+    sharedFilteredData = filteredData;
   
     navigate(`/Logs/RecordTable/${month.abbreviation}`, { state: { data: filteredData } });
 
-    
+    handleExportData(month);
+
     }
   }
 
   
 
-  const handleExportData = async () => {
-    const currentMonth = new Date().toLocaleString('en-US', { month: 'long' });
-    const formattedMonth = currentMonth.toUpperCase();
-
-    // Fetch the data for the selected month
-    const response = await fetch(`/api/realm/monthdata?month=${formattedMonth}`);
-    const data = await response.json();
+  const handleExportData = async (month) => {
+    // // const formattedMonth =  month.find(month => month.name === filteredData);
+    // // const response = await fetch(`/api/realm/monthdata`);
+    // // const data = await response.json();
+    // const filteredData = sharedFilteredData;
   
+    // // const filteredData = data.filter(
+    // //   (param) =>
+    // //     new Date(param.createdAt).toLocaleString("en-PH", { month: "long" }).toUpperCase() === month.name
+    // // );
+  
+    const response = await fetch(`/api/realm/monthdata`);
+    const data = await response.json();
+
+    const filteredData = data.filter(
+        (param) =>
+         new Date(param.createdAt).toLocaleString("en-PH", { month: "long" }).toUpperCase() === month.name
+      );
+
     // Map the filtered data to match the CSV fields
-    const mappedData = data.map(({ id, sensor, type, value, status, createdAt }) => ({
+    const mappedData = filteredData.map(({ id, sensor, type, value, status, createdAt }) => ({
       id,
       sensor,
       type,
@@ -177,9 +192,12 @@ const MonthLogs = () => {
     const wb = writeXLSX.utils.book_new();
   
     // Filter the data by parameter type and create separate sheets for each parameter
-    const tempData = mappedData.filter(({ type, createdAt }) => type === 'temperature' && new Date(createdAt).toLocaleString('en-PH', { month: 'long' }).toUpperCase() === formattedMonth);
-    const turbidData = mappedData.filter(({ type, createdAt }) => type === 'turbidity' && new Date(createdAt).toLocaleString('en-PH', { month: 'long' }).toUpperCase() === formattedMonth);
-    const phData = mappedData.filter(({ type, createdAt }) => type === 'pH' && new Date(createdAt).toLocaleString('en-PH', { month: 'long' }).toUpperCase() === formattedMonth);
+    // const tempData = mappedData.filter(({ type, createdAt }) => type === 'temperature' && new Date(createdAt).toLocaleString('en-PH', { month: 'long' }).toUpperCase() === filteredData);
+    // const turbidData = mappedData.filter(({ type, createdAt }) => type === 'turbidity' && new Date(createdAt).toLocaleString('en-PH', { month: 'long' }).toUpperCase() === filteredData);
+    // const phData = mappedData.filter(({ type, createdAt }) => type === 'pH' && new Date(createdAt).toLocaleString('en-PH', { month: 'long' }).toUpperCase() === filteredData);
+    const tempData = mappedData.filter(({ type }) => type === 'temperature');
+    const turbidData = mappedData.filter(({ type }) => type === 'turbidity');
+    const phData = mappedData.filter(({ type }) => type === 'pH');
 
   
     const tempSheet = writeXLSX.utils.json_to_sheet(tempData);
@@ -297,7 +315,7 @@ const MonthLogs = () => {
                           
                         >
                           <MenuItem style={{color: 'white', fontFamily: 'Poppins'}} onClick={handleClearData}><span style={{padding:'0.7rem'}}> Clear Data </span></MenuItem>
-                          <MenuItem style={{color: 'white', fontFamily: 'Poppins'}} onClick={(e) => handleExportData(month, e)}><span style={{padding:'0.7rem'}}> Export Data </span> </MenuItem>
+                          <MenuItem style={{color: 'white', fontFamily: 'Poppins'}} onClick={(e) => handleExportData(month) }><span style={{padding:'0.7rem'}}> Export Data </span> </MenuItem>
                           <MenuItem style={{color: 'white', fontFamily: 'Poppins'}} onClick={handleBackupData}><span style={{padding:'0.7rem'}}> Backup Data </span> </MenuItem>
                         </Menus>
                       </span>

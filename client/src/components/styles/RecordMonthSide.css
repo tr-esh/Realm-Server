@@ -26,10 +26,16 @@
     box-shadow: inset 0 0 0 1px #5090D3;
 }
 
+.param-container.active {
+    background-color: #17334e; /* Add your desired active background color */
+    box-shadow: inset 0 0 0 1px #5090D3; /* You can customize this as well */
+}
+
 .param-container:hover .water-icon, 
 .param-container.active .water-icon {
   color: #ffff;
 }
+
 .param-container:hover .select{
     color: #6cb8ff;
     font-size: 2rem;
@@ -43,6 +49,10 @@
 .param-container:hover .icons-holder{
     width: 8rem;
 }
+.param-container.active .icons-holder{
+    width: 8rem;
+}
+
 .param-name{
     font-size: 1rem;
 }

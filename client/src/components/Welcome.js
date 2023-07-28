@@ -18,7 +18,7 @@ function Welcome() {
                         fontSize: '2rem'}}><TimeGreetings /></span>
         
       </div>
-      <div style={{fontSize: '2rem'}}>Dale</div>
+      <div style={{fontSize: '2rem'}}>Admin</div>
 
 
 

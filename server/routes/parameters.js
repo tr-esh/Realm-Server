@@ -3,7 +3,7 @@ const { postTemperature, postTurbidity, postpHLevel, getTemp, getTurbidity, getp
 const { fetchTemp, fetchTurbidity, fetchph, fetchParameters, getHourlyMean} = require('../controllers/gettersController');
 const { allParameters, getAllParameters, barParameters } = require('../controllers/streamsController');
 const { highParameters } = require('../controllers/highValue');
-
+const { calculateAverage } = require('../controllers/calculateController')
 const router = express.Router()
 
 router.get('/api', function(req, res){
@@ -36,6 +36,7 @@ router.get('/fetchAllParameters', getAllParameters)
 router.get('/bardata', highParameters)
 
 router.get('/monthdata', fetchParameters)
+router.get('/calcuAverage', calculateAverage)
 
 
 
