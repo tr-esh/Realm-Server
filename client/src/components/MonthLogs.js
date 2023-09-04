@@ -1,7 +1,5 @@
-import PlaylistAddCheckCircleRoundedIcon from '@mui/icons-material/PlaylistAddCheckCircleRounded';
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from 'react';
-import Brightness1RoundedIcon from '@mui/icons-material/Brightness1Rounded';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -11,12 +9,49 @@ import { styled } from '@mui/material/styles';
 import * as writeXLSX from 'xlsx';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import './styles/month-logs.css';
+import Lottie from 'react-lottie-player';
+import circleOutlineAnimation from '../img/wired-outline-105-loader-1.json';  // Replace with the path to your downloaded Lottie file
+
+
+
+function NextArrow(props) {
+  const { buttonNext, style, onClick } = props;
+  return (
+    <div
+      className={`${buttonNext} slick-next custom-arrow`} // add the slick-next class
+      style={{ ...style, display: "block", backgroundColor: "gray" }}
+      onClick={onClick}
+    />
+  );
+}
+
+function PrevArrow(props) {
+  const { buttonPrev, style, onClick } = props;
+  return (
+    <div
+      className={`${buttonPrev} slick-prev custom-arrow`} // add the slick-prev class
+      style={{ ...style, display: "block", backgroundColor: "gray" }}
+      onClick={onClick}
+    />
+  );
+}
+
 
 
 
 const MonthLogs = () => {
 
   const [sliderIndex, setSliderIndex] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsHovering(true);
+  }
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+  }
   
   const settings = {
     dots: false,
@@ -24,7 +59,9 @@ const MonthLogs = () => {
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 2,
-    initialSlide: 0,  
+    initialSlide: 0,
+    nextArrow: isHovering ? <NextArrow /> : null,
+    prevArrow: isHovering ? <PrevArrow /> : null,  
     afterChange: (index) => setSliderIndex(index),   
   };
 
@@ -50,8 +87,11 @@ const MonthLogs = () => {
 
   
   const [anchorEl, setAnchorEl] = useState('');
+  const [selectedMonthData, setSelectedMonthData] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState(null);
   
-  const handleMenuClick = (event) => {
+  const handleMenuClick = (event, month) => {
+    setSelectedMonth(month);
     setAnchorEl(event.currentTarget);
   };
 
@@ -85,7 +125,7 @@ const MonthLogs = () => {
     { abbreviation: "December", name: "DECEMBER", data: [], count: 0 },
   ]);
 
-  
+ 
 
   useEffect(() => {
     const fetchDataForAllMonths = async () => {
@@ -131,74 +171,57 @@ const MonthLogs = () => {
 
   let sharedFilteredData = [];
   
+  
   const handleMonthClick = async (month, event) => {
+    if (event.target.closest('.MuiIconButton-root') !== null) {
+      return;
+    }
+    setSelectedMonth(month); // Also set the selected month here
     const response = await fetch(`/api/realm/monthdata`);
     const data = await response.json();
-  
-    if (event.target.closest('.MuiIconButton-root') === null) {
-    // Filter the data for the selected month
     const filteredData = data.filter(
       (param) =>
         new Date(param.createdAt).toLocaleString("en-PH", { month: "long" }).toUpperCase() === month.name
     );
-
-    sharedFilteredData = filteredData;
-  
+    setSelectedMonthData(filteredData);
     navigate(`/Logs/RecordTable/${month.abbreviation}`, { state: { data: filteredData } });
-
-    handleExportData(month);
-
-    }
   }
-
   
 
-  const handleExportData = async (month) => {
-    // // const formattedMonth =  month.find(month => month.name === filteredData);
-    // // const response = await fetch(`/api/realm/monthdata`);
-    // // const data = await response.json();
-    // const filteredData = sharedFilteredData;
-  
-    // // const filteredData = data.filter(
-    // //   (param) =>
-    // //     new Date(param.createdAt).toLocaleString("en-PH", { month: "long" }).toUpperCase() === month.name
-    // // );
-  
+  const handleExportData = async () => {
+    console.log("Export Data Clicked"); // Just to confirm this function is being triggered
+
+    // Fetch the data for the selected month
     const response = await fetch(`/api/realm/monthdata`);
     const data = await response.json();
-
     const filteredData = data.filter(
-        (param) =>
-         new Date(param.createdAt).toLocaleString("en-PH", { month: "long" }).toUpperCase() === month.name
-      );
-
+      (param) =>
+        new Date(param.createdAt).toLocaleString("en-PH", { month: "long" }).toUpperCase() === selectedMonth.name
+    );
+  
     // Map the filtered data to match the CSV fields
     const mappedData = filteredData.map(({ id, sensor, type, value, status, createdAt }) => ({
-      id,
-      sensor,
-      type,
-      value: Array.isArray(value) ? value.join(', ') : value,
-      status,
-      createdAt: new Date(createdAt).toLocaleString('en-PH', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
+        id,
+        sensor,
+        type,
+        value: Array.isArray(value) ? value.join(', ') : value,
+        status,
+        createdAt: new Date(createdAt).toLocaleString('en-PH', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+        }),
     }));
   
     // Initialize the workbook
     const wb = writeXLSX.utils.book_new();
   
-    // Filter the data by parameter type and create separate sheets for each parameter
-    // const tempData = mappedData.filter(({ type, createdAt }) => type === 'temperature' && new Date(createdAt).toLocaleString('en-PH', { month: 'long' }).toUpperCase() === filteredData);
-    // const turbidData = mappedData.filter(({ type, createdAt }) => type === 'turbidity' && new Date(createdAt).toLocaleString('en-PH', { month: 'long' }).toUpperCase() === filteredData);
-    // const phData = mappedData.filter(({ type, createdAt }) => type === 'pH' && new Date(createdAt).toLocaleString('en-PH', { month: 'long' }).toUpperCase() === filteredData);
+    // Filter the data by parameter type and create separate sheets for each parameter\
     const tempData = mappedData.filter(({ type }) => type === 'temperature');
     const turbidData = mappedData.filter(({ type }) => type === 'turbidity');
     const phData = mappedData.filter(({ type }) => type === 'pH');
-
   
     const tempSheet = writeXLSX.utils.json_to_sheet(tempData);
     const turbidSheet = writeXLSX.utils.json_to_sheet(turbidData);
@@ -213,7 +236,7 @@ const MonthLogs = () => {
     const wbout = writeXLSX.write(wb, { type: 'binary', bookType: 'xlsx' });
   
     // Download the workbook as an Excel file
-    const fileName = 'logs.xlsx';
+    const fileName = `${selectedMonth.name.toLowerCase()}_logs.xlsx`;
     const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
   
     const link = document.createElement('a');
@@ -223,32 +246,30 @@ const MonthLogs = () => {
   
     // Convert binary string to array buffer
     function s2ab(s) {
-      const buf = new ArrayBuffer(s.length);
-      const view = new Uint8Array(buf);
-      for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xff;
-      return buf;
+        const buf = new ArrayBuffer(s.length);
+        const view = new Uint8Array(buf);
+        for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xff;
+        return buf;
     }
-  }
-
- 
-  
-
-  
-  
-  // Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'book_new')
+}
 
 
     return(
       
-        <div className="month-logs">
-            <Slider {...settings}>
+      <div className="month-logs" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <Slider {...settings}>
         {months.map((month) => (
-              <button key={month.abbreviation} 
-                      onClick={(e) => handleMonthClick(month, e)} 
-                      className="monthly-logs" 
-                      disabled={!month.data || month.data.length === 0}>
+          <div
+            key={month.abbreviation}
+            onClick={month.data && month.data.length > 0 ? (e) => handleMonthClick(month, e) : null}
+            className={`monthly-logs ${!month.data || month.data.length === 0 ? 'disabled-month' : ''}`}
+            role="button"
+            onKeyDown={month.data && month.data.length > 0 ? (e) => handleMonthClick(month, e) : null}
+            tabIndex={0}
+            style={{ pointerEvents: month.data && month.data.length > 0 ? 'auto' : 'none' }}
+          >
                     
-                    <div style={{}}>
+                    <div style={{ width: '200px' }}>
                       <div className="months" 
                           style={{ display: 'flex', 
                           justifyContent: 'space-between', 
@@ -257,12 +278,17 @@ const MonthLogs = () => {
                             {month.data && month.data.length > 0 ? (
                               <div className='reading-count' style={{fontWeight:'600', 
                                                                       fontSize: '2.3rem',
-                                                                      marginTop: '-2rem'}}>
+                                                                      marginTop: '2rem'}}>
                                   {month.data.length}
                               </div>
                               ) : (
                               <div className='no-readings' style={{marginTop: '1.5rem'}}>
-                                      no data
+                                      <Lottie
+                                      animationData={circleOutlineAnimation}
+                                      play
+                                      loop
+                                      style={{ width: 40, height: 40, margin: 'auto' }}  // Adjust the width and height as needed
+                                    />
                               </div>
                               )}
                       </div>
@@ -277,11 +303,24 @@ const MonthLogs = () => {
                       </div>
                     </div> 
 
-                    
+                    <Menus 
+                          anchorEl={anchorEl}
+                          open={Boolean(anchorEl)}
+                          onClose={handleMenuClose}
+                          
+                        >
+                          <MenuItem style={{color: 'white', fontFamily: 'Poppins'}} onClick={handleClearData}><span style={{padding:'0.7rem'}}> Clear Data </span></MenuItem>
+                          <MenuItem style={{color: 'white', fontFamily: 'Poppins'}}
+                                    onClick={(e) => {
+                                    e.stopPropagation(); // prevent event bubbling to handleMonthClick
+                                    handleExportData();
+                                    }}><span style={{padding:'0.7rem'}}> Export Data </span> </MenuItem>
+                          <MenuItem style={{color: 'white', fontFamily: 'Poppins'}} onClick={handleBackupData}><span style={{padding:'0.7rem'}}> Backup Data </span> </MenuItem>
+                      </Menus>
                                   
                     <div className="buttomCon"
                           style={{ display: 'flex', gap: '2rem', marginLeft: '-2rem',
-                          width: '299px', height: '75px',
+                          width: '292px', height: '75px',
                           flexDirection: 'row', padding: '0 2ch',backgroundColor: '#66B2FF', 
                           borderBottomLeftRadius: '1.6rem', borderBottomRightRadius: '1.6rem',
                           alignItems:'center', bottom: '0',
@@ -295,37 +334,25 @@ const MonthLogs = () => {
                         {month.data && month.data.length > 0 ? 'Active' : 'Offline'}
                       
                       
-                      <span >
-                        <IconButton
-                            onClick={handleMenuClick}
-                            sx={{
-                              fontSize: 25,
-                              color: '#e3f2fd',
-                              display: 'flex',
-                              marginLeft: '13rem'
-                            }}
-                            disabled={!month.data || month.data.length === 0}
-                        >
-                            <MoreHorizIcon sx={{ fontSize: 25, color: '#e3f2fd', display: 'flex'}} />
-                        </IconButton>
-                        <Menus 
-                          anchorEl={anchorEl}
-                          open={Boolean(anchorEl)}
-                          onClose={handleMenuClose}
-                          
-                        >
-                          <MenuItem style={{color: 'white', fontFamily: 'Poppins'}} onClick={handleClearData}><span style={{padding:'0.7rem'}}> Clear Data </span></MenuItem>
-                          <MenuItem style={{color: 'white', fontFamily: 'Poppins'}} onClick={(e) => handleExportData(month) }><span style={{padding:'0.7rem'}}> Export Data </span> </MenuItem>
-                          <MenuItem style={{color: 'white', fontFamily: 'Poppins'}} onClick={handleBackupData}><span style={{padding:'0.7rem'}}> Backup Data </span> </MenuItem>
-                        </Menus>
-                      </span>
-                   </div>
+                        <span >
+                          <IconButton
+                              onClick={(e) => handleMenuClick(e, month)}
+                              sx={{
+                                fontSize: 25,
+                                color: '#e3f2fd',
+                                display: 'flex',
+                                marginLeft: '13rem'
+                              }}
+                              disabled={!month.data || month.data.length === 0}>
+                              <MoreHorizIcon sx={{ fontSize: 25, color: '#e3f2fd', display: 'flex'}} />
+                          </IconButton>
+                        </span>
+                        
+                      </div>
                     </div>
-              </button>
+              </div>
             ))}
-          </Slider>
-              
-              
+          </Slider>            
           
         </div>
     )

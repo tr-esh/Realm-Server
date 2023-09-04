@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
@@ -22,6 +23,10 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import TemperatureHome from '../Analytic/Predictive/TemperatureHome';
+import TurbidityHome from '../Analytic/Predictive/TurbidityHome';
+import PhHome from '../Analytic/Predictive/PhHome';
+
 
 
 
@@ -37,17 +42,6 @@ const Item = styled(Paper)(({ theme }) => ({
     boxShadow: 'none',
   })
 );
-
-function calculateProgress(temperature, turbidity, phLevel) {
-  const statusValues = [temperature.status, turbidity.status, phLevel.status];
-  const maxStatusValue = Math.max(
-    statusValues.filter(status => status !== "Normal").length,
-    2
-  );
-  return maxStatusValue / statusValues.length;
-}
-
- const value = '';
 
  ChartJS.register(
   CategoryScale,
@@ -68,6 +62,16 @@ const DashboardMain = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [frequencyData, setFrequencyData] = useState([]);
   
+  const [latestReadings, setLatestReadings] = useState([]);
+  const [overallIndex, setOverallIndex] = useState(null);
+  const [interpretation, setInterpretation] = useState('');
+
+  const getPathColor = (percentage) => {
+    if (percentage <= 25) return '#0A1929';  
+    if (percentage <= 50) return '#FFC300';
+    if (percentage <= 75) return '#ffc661'; 
+    return '#FF6384';                         
+  }
 
 
 
@@ -76,13 +80,15 @@ const DashboardMain = () => {
     
 
       const fetchData = async () => {
-            const [res1, res2] = await Promise.all([
+            const [res1, res2, res3] = await Promise.all([
               fetch('/api/realm/fetchParameters'),
               fetch('/api/realm/bardata'),
+              fetch('api/realm/fetchAllParameters')
             ]);
 
             const json1 = await res1.json()
             const json2 = await res2.json()
+            const json3 = await res3.json()
 
           if (res1.ok){
             setTemperature(json1);
@@ -93,19 +99,58 @@ const DashboardMain = () => {
           if (res2.ok){
             setFrequencyData(json2);
           }
+          if (res3.ok){
+            setLatestReadings(json3);
+          }
     };
 
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (latestReadings.length === 3) {
+      const temperatureWeight = 0.3;
+      const phWeight = 0.4;
+      const turbidityWeight = 0.3;
+
+      let temperatureValue = latestReadings[0].temperature_value;
+      if (temperatureValue > 25 && temperatureValue <= 50) {
+        temperatureValue = 25; // Cap value at 25 for the higher range
+      }
+      const normalizedTemperature = (temperatureValue - 5) / (25 - 5);
+
+      // Identify pH range
+      let phValue = latestReadings[2].ph_value;
+      if (phValue < 6.5 && phValue >= 1.0) {
+        phValue = 6.5; // Cap value at 6.5 for the lower range
+      }
+      const normalizedPh = (phValue - 6.5) / (8.5 - 6.5);
+
+      const normalizedTurbidity = latestReadings[1].ntu_value / 10;
+
+      const temperatureSubIndex = normalizedTemperature * temperatureWeight;
+      const phSubIndex = normalizedPh * phWeight;
+      const turbiditySubIndex = normalizedTurbidity * turbidityWeight;
+
+      const calculatedOverallIndex = temperatureSubIndex + phSubIndex + turbiditySubIndex;
+
+      setOverallIndex(calculatedOverallIndex);
+      
+
+      if (calculatedOverallIndex < 0.4) {
+        setInterpretation('Safe');
+      } else if (calculatedOverallIndex < 0.6) {
+        setInterpretation('Conditional');
+      } else {
+        setInterpretation('Unsafe');
+      }
+    }
+  }, [latestReadings]);
 
 
-  
+
   
 const graphIllustration = new URL('../../img/graph_illustration.png', import.meta.url)
-const bucketIcon = new URL('../../img/icons8-whitebucket-96.png', import.meta.url)
-const filterIcon = new URL('../../img/icons8-whitefilter-96.png', import.meta.url)
-const kettleIcon = new URL('../../img/icons8-whiteteapot-96.png', import.meta.url)
 
 
 
@@ -118,44 +163,53 @@ const kettleIcon = new URL('../../img/icons8-whiteteapot-96.png', import.meta.ur
       <Box>
         <Grid container spacing={2}>
 
-        <Grid xs={6} md={6}
+        <Grid xs={12} md={6} lg= {6}
              item className="card">
               <Item style={{  height: '14rem', backgroundColor: '#66B2FF'}} elevation={0}>
                   <CardContent  className="Status">
                       <div  className='headings'
                         style={{  fontFamily: 'Poppins, sans-serif', 
                         fontWeight: '600', lineHeight: '0.9', 
-                        padding: '0.5rem 1rem'}}> 
+                        padding: '0.5rem 0.3rem'}}> 
                             
-                            <span style={{  fontSize: '3rem', 
+                            <span style={{  fontSize: '1.5rem', 
                             fontWeight:'700' }}
-                            >STATUS</span>
+                            >PHYSICOCHEMICAL</span>
 
                             <span style={{  fontSize: '3rem', 
                             fontWeight:'700', color:'#0A1929', paddingBottom: '1.5rem' }}
-                            >TODAY</span>
+                            >STATUS</span>
                             
-                            <span style={{  backgroundColor: '#0A1929', fontSize: '1.25em',
+                            {latestReadings.length === 3 && (
+                            <span style={{  backgroundColor: '#0A1929', fontSize: '1em',
                             padding: ' 1.5rem 3.5rem', color: '#ffff', borderRadius: '2.5rem',
-                            textAlign: 'center'}}
-                            >SAFE</span>
+                            textAlign: 'center', textTransform: 'uppercase'}}
+                            >{interpretation}
+                            </span>
+                            
+                            )}
                         </div>
 
                         <div 
-                          style={{  
-                          paddingLeft: '1rem', 
+                          style={{   
                           paddingTop: '0.1rem'}}>
                           
                           <CircularProgressbar 
-                             value={calculateProgress(temperature, turbidity, phLevel)} 
+                              className="custom-progress-bar"
+                              value={overallIndex} 
                               maxValue={1} 
-                              text={`${value * 100}%`}
+                              text={`${(overallIndex * 100).toFixed(2)}%`}
                               strokeWidth={5}
                               styles={buildStyles({
-                              strokeLinecap: "butt",
-                              textSize: '0.65rem',
-                              textColor: "#0A1929",
-                              pathColor: "#0A1929"})}/>
+                                  strokeLinecap: "round",
+                                  textSize: '0.6rem',
+                                  textColor: "#0A1929",
+                                  pathColor: getPathColor(overallIndex * 100),
+                                  fontFamily: 'Poppins'
+                              })}
+                          />
+
+
                         </div>
 
             
@@ -163,87 +217,48 @@ const kettleIcon = new URL('../../img/icons8-whiteteapot-96.png', import.meta.ur
             </Item>
           </Grid>
 
-            <Grid xs={6} md={6}
-             item className="card">
-              <Item style={{  height: '14rem'  }}>
-                <CardContent className="Recents"  
-                    style={{ padding: '1rem 2rem' }}>
-                    
-                    <div className="Insight" >
-                      <p className='Headline'
-                      style={{fontFamily: 'Inter', 
-                              fontSize: '0.8rem',
-                              textAlign: 'left', 
-                              fontWeight: '200'}}> 
-                       Suggestions for you today 
-                      </p>
-                      
-                      <div className='Suggestions'
-                      style={{display: 'flex', 
-                              flexDirection: 'row'}}>
-                        
-                        <div className='leftSuggestions'
-                        style={{display: 'flex', 
-                                flexDirection: 'column'}}>
-                            <div style={{width: '13rem', height: '5rem', marginTop: '0.5rem'}}> 
-                              <div style={{padding:'1rem', display: 'flex'}}>
-                                <div style={{backgroundColor:'#122B44', width: '3.5rem', borderRadius: '1.2rem', height:'3.2rem', display: 'flex', alignItems:'center', justifyContent:'center'}}>
-                                  <img style={{width: '1.5rem'}} src={bucketIcon} alt="bucket" /> 
-                            </div>
-                                 <div style={{marginLeft:'0.9rem', lineHeight:'1', margin: 'auto', textAlign: 'left'}}> 
-                                    <p> Fetch </p>
-                                    <p1 style={{fontSize:'0.8rem', fontFamily:'Inter', fontWeight:'400'}}> Allowed </p1>
-                                  </div>
-                              </div> 
-                        </div>
-                            
-                            <div 
-                            style={{width: '13rem', 
-                                    height: '5rem', 
-                                    marginTop: '0.5rem'}}> 
-                            <div style={{padding:'1rem', display: 'flex'}}>
-                              <div style={{backgroundColor:'#122B44', width: '3.5rem', borderRadius: '1.2rem', height:'3.2rem', display: 'flex', alignItems:'center', justifyContent:'center'}}>
-                                <img style={{width: '1.5rem'}} src={filterIcon} alt="bucket" /> 
-                            </div>
-                                    <div style={{marginLeft:'0.9rem', lineHeight:'1', margin: 'auto', textAlign: 'left'}}> 
-                                        <p> Filtration </p>
-                                        <p1 style={{fontSize:'0.8rem', fontFamily:'Inter', fontWeight:'400'}}> Likely needed </p1>
-                                   </div>
-                                </div> 
-                              </div>
-                          </div>
-                        
-                        <div className='rightSuggestions'
-                           style={{display: 'flex', 
-                                   flexDirection: 'column', 
-                                   marginLeft: '1rem'}}>
-                            <div style={{width: '13rem', height: '5rem', marginTop: '0.5rem'}}> 
-                                <div style={{padding:'1rem', display: 'flex'}}>
-                                  <div style={{backgroundColor:'#122B44', width: '3.5rem', borderRadius: '1.2rem', height:'3.2rem', display: 'flex', alignItems:'center', justifyContent:'center'}}>
-                                    <img style={{width: '1.5rem'}} src={kettleIcon} alt="bucket" /> 
-                            </div>
-                                  <div style={{marginLeft:'0.9rem', lineHeight:'1', margin: 'auto', textAlign: 'left'}}> 
-                                    <p> Distillation </p>
-                                      <p1 style={{fontSize:'0.8rem', fontFamily:'Inter', fontWeight:'400'}}> Likely needed </p1>
-                                  </div>
-                            </div> 
-                        </div>
-                            
-                            <div 
-                            style={{width: '13rem', 
-                                    height: '5rem', 
-                                    marginTop: '0.8rem'}}> 
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                </CardContent>
-              </Item>
-            </Grid>
+          <Grid xs={6} md={6} lg= {6} 
+          item className="card" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Item style={{ height: '14rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <CardContent className="Recents">
+              <div className='card-overview' style={{ textAlign: 'center' }}>
+
+              <p style={{ fontFamily: 'Poppins', fontWeight: '700', fontSize: '1.3rem', textAlign: 'left', marginBottom: '3rem', textTransform: 'uppercase' }}>
+                  Forecast <span style={{color: '#66B2FF'}}> Tomorrow </span>
+                  <p style={{fontWeight: '400', fontSize: '0.7rem', lineHeight: '3px', textTransform: 'Capitalize'}}>
+                     Expected insights for tomorrow. Click to view more.
+                    </p>
+
+                </p>
+              
+                  
+               
+                <div className='home-cast' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                  <div style={{ width: '10rem', margin: 'auto' }}>
+                    <Link to="/Analytics/temperature" style={{ display: 'block', textDecoration: 'none', color: 'white' }}>
+                      <TemperatureHome />
+                    </Link>
+                  </div>
+                  <div style={{ width: '10rem', margin: 'auto' }}>
+                    <Link to="/Analytics/turbidity" style={{ display: 'block', textDecoration: 'none', color: 'white' }}>
+                      <TurbidityHome />
+                    </Link>
+                  </div>
+                  <div style={{ width: '10rem', margin: 'auto' }}>
+                    <Link to="/Analytics/ph" style={{ display: 'block', textDecoration: 'none', color: 'white' }}>
+                      <PhHome />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Item>
+        </Grid>
+
 
             
 
-            <Grid xs={6} md={4} 
+            <Grid xs={12} md={4} 
             item className="card">
                 {isLoading ? (
               <Skeleton variant="rect" height={150} style={{borderRadius:'1.6rem'}}/>
@@ -303,7 +318,7 @@ const kettleIcon = new URL('../../img/icons8-whiteteapot-96.png', import.meta.ur
               )}
             </Grid>
 
-            <Grid xs={6} md={4}
+            <Grid xs={12} md={4}
              item className="card">
               {isLoading ? (
               <Skeleton variant="rect" height={150} style={{borderRadius:'1.6rem'}}/>
@@ -357,7 +372,7 @@ const kettleIcon = new URL('../../img/icons8-whiteteapot-96.png', import.meta.ur
                )}
             </Grid>
 
-            <Grid xs={6} md={4}
+            <Grid xs={12} md={4}
              item className="card">
                {readings.map(phLevel => (
               <Item style={{  height: '10rem', backgroundColor: '#10273d' }} >

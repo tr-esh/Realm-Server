@@ -2,60 +2,83 @@ const TemperatureReading = require('../models/temperatureModel')
 const TurbidityReading = require('../models/turbidityModel')
 const phLevelReading = require('../models/phLevelModel')
 
-// const mongoose = require('mongoose');
-// const admin = require('firebase-admin');
-// const mongodbConnString = "mongodb+srv://realmadmin:ZSt6kE8TzgVq92jt@realmcluster.ole0mns.mongodb.net/?retryWrites=true&w=majority"
+// const getallData = async (req, res) => {
+    
+//   try {
+//       const temp = await TemperatureReading.find({}).sort({createdAt: -1})
+//       const turbid = await TurbidityReading.find({}).sort({createdAt: -1})
+//       const ph = await phLevelReading.find({}).sort({createdAt: -1})
 
-// // Establish connection to MongoDB
-// mongoose.connect(mongodbConnString, { useNewUrlParser: true, useUnifiedTopology: true });
-// const db = mongoose.connection;
+//      const Params = [...temp, ...turbid, ...ph]
+    
 
-// db.on('error', console.error.bind(console, 'connection error:'));
-// db.once('open', function() {
-//   console.log('Connected to MongoDB');
-// });
-
-// const serviceAccount = require('../../../../streamparameters-firebase-adminsdk-w0njb-d513bde297.json')
-
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount),
-//   databaseURL: 'https://streamparameters-default-rtdb.firebaseio.com/'
-// });
-
-// console.log('Connected to Firebase');
-
-// const postTemperature = async (req, res) => {
-//     const { IoT_module, sensor_code, sensor_type, parameter_name, temperature_value, status } = req.body
-
-//     try {
-//         const reading = await TemperatureReading.create({ IoT_module, sensor_code, sensor_type, parameter_name, temperature_value, status })
-//         res.status(200).json(reading)
-//     } catch (error) {
-//         res.status(400).json({error: error.message})
-//     }
+//       res.status(200).json(Params)
+      
+//   } catch (error) {
+//       res.status(500).json({message: 'Cannot get all the request'})
+//   }    
 // }
 
-// const postTurbidity = async (req, res) => {
-//     const { IoT_module, sensor_code, sensor_type, parameter_name, ntu_value, status } = req.body
+const getallData = async (req, res) => {
+  try {
+    const temp = await TemperatureReading.find({}).sort({ createdAt: -1 });
+    const turbid = await TurbidityReading.find({}).sort({ createdAt: -1 });
+    const ph = await phLevelReading.find({}).sort({ createdAt: -1 });
 
-//     try {
-//         const reading = await TurbidityReading.create({ IoT_module, sensor_code, sensor_type, parameter_name, ntu_value, status  })
-//         res.status(200).json(reading)
-//     } catch (error) {
-//         res.status(400).json({error: error.message})
+    // Add type property to each item in the arrays to differentiate between data types
+    const tempData = temp.map(item => ({ ...item.toObject(), type: 'TEMPERATURE' }));
+    const turbidData = turbid.map(item => ({ ...item.toObject(), type: 'TURBIDITY' }));
+    const phData = ph.map(item => ({ ...item.toObject(), type: 'PH' }));
+
+    // Merge the arrays
+    const Params = [...tempData, ...turbidData, ...phData];
+
+    res.status(200).json(Params);
+  } catch (error) {
+    res.status(500).json({ message: 'Cannot get all the request' });
+  }
+};
+
+
+
+// const getallData = async (req, res) => {   
+//   try {
+//     const temp = await TemperatureReading.find({}).sort({createdAt: -1})
+//     const turbid = await TurbidityReading.find({}).sort({createdAt: -1})
+//     const ph = await phLevelReading.find({}).sort({createdAt: -1})
+
+//     const Params = {
+//       temperature: temp, 
+//       turbidity: turbid, 
+//       ph: ph
 //     }
+
+//     res.status(200).json(Params)
+      
+//   } catch (error) {
+//     res.status(500).json({message: 'Cannot get all the request'})
+//   }    
 // }
 
-// const postpHLevel = async (req, res) => {
-//     const { IoT_module, sensor_code, sensor_type, parameter_name, ph_value, status  } = req.body
 
-//     try {
-//         const reading = await phLevelReading.create({ IoT_module, sensor_code, sensor_type, parameter_name, ph_value, status  })
-//         res.status(200).json(reading)
-//     } catch (error) {
-//         res.status(400).json({error: error.message})
-//     }
-// }
+
+// const getallData = async (req, res) => {
+//   try {
+//     const tempPromise = TemperatureReading.find({}).sort({ createdAt: -1 }).lean().exec();
+//     const turbidPromise = TurbidityReading.find({}).sort({ createdAt: -1 }).lean().exec();
+//     const phPromise = phLevelReading.find({}).sort({ createdAt: -1 }).lean().exec();
+
+//     const [temp, turbid, ph] = await Promise.all([tempPromise, turbidPromise, phPromise]);
+
+//     const Params = { temperature: temp, turbidity: turbid, ph: ph };
+
+//     res.status(200).json(Params);
+//   } catch (error) {
+//     res.status(500).json({ message: 'Cannot get all the request' });
+//   }
+// };
+
+
 
 function isTemperatureValid(temperature) {
   // Check if temperature is within valid range
@@ -64,7 +87,7 @@ function isTemperatureValid(temperature) {
 
 function isTurbidityValid(turbidity) {
   // Check if turbidity is within valid range
-  return turbidity >= 0 && turbidity <= 5;
+  return turbidity >= 0 && turbidity <= 3000;
 }
 
 function isPhValueValid(phValue) {
@@ -246,4 +269,4 @@ const getph = async (req, res) => {
 
 
 
-module.exports = { postTemperature, postTurbidity, postpHLevel, getTemp, getTurbidity, getph, getParameters }
+module.exports = { postTemperature, postTurbidity, postpHLevel, getTemp, getTurbidity, getph, getParameters, getallData }

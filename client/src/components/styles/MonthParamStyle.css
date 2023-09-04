@@ -1,0 +1,13 @@
+ .chart-container text {
+    font-family: 'Poppins';
+    text-transform: uppercase;
+    
+}
+.chart-responsive-container{
+    top: -3rem;
+    position: relative;
+}
+.stack-responsive-container{
+    top: -7rem;
+    position: relative;
+}

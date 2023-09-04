@@ -20,7 +20,7 @@ export const SidebarData = [
     {
         icon: <FormatListBulletedRoundedIcon className='sidebar-icon' sx={{ fontSize: 30, paddingTop:'0.5rem'}}/> ,
         path: "/Logs",
-        heading: "Record Logs",
+        heading: "Log Entries",
     },
     // {
     //     icon: <SettingsRoundedIcon className='sidebar-icon' sx={{ fontSize: 30, paddingTop:'0.5rem'}}/> ,

@@ -124,7 +124,8 @@ const DashboardSide = () => {
         <div style={{fontSize: '0.8rem', fontWeight:'400', 
                     marginTop:'0.5rem', lineHeight: 1.3, padding:'1.2rem'}}>
                     Keep a watchful eye on water quality with REALM, the innovative IoT
-                    solution that simplifies and streamlines water quality monitoring in real-time.
+                    solution that simplifies and streamlines selected physicochemical water 
+                    quality parameter monitoring in real-time.
         </div>
         <div className="Header" style={{gap: '12rem'}}>
           <span style={{

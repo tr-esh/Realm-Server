@@ -21,8 +21,8 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const RecordSide = () => {
   return (
-    <div className="record-side">
-      <div className='slogan-side'> 
+    <div className="record-side" >
+      <div className='slogan-side' style={{ marginTop: '2rem' }}> 
         Unlock insights with 
         <span style={{ color: '#66B2FF', marginLeft: '4px' }}>
             organized data - Datasets!

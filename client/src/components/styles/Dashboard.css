@@ -92,6 +92,12 @@
   }
 
 
+  .custom-progress-bar .CircularProgressbar-text {
+    font-weight: 700;
+}
+
+
+
 @media screen and (max-width: 1200px ) {
     .item{
         display: flex;

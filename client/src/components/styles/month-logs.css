@@ -1,0 +1,33 @@
+.monthly-logs{
+    margin: 0 auto;
+    padding: 0;
+    box-sizing: border-box;
+    width: 95%;
+}
+
+
+.slick-prev,
+.slick-next {
+  opacity: 0;
+}
+
+.month-logs:hover .slick-prev,
+.month-logs:hover .slick-next {
+  opacity: 1;
+  border-radius: 50%; 
+}
+
+.custom-arrow {
+  transition: all 0.3s ease;
+}
+
+.custom-arrow:hover {
+    background-color: #66B2FF; 
+    cursor: pointer; 
+    border-radius: 50%; 
+  }
+
+  .disabled-month {
+    opacity: 0.5; 
+    cursor: not-allowed;
+}

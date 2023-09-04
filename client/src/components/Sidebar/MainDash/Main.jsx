@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useParams } from 'react-router-dom'
 import Analytics from '../../../pages/Analytics'
 import ControlPanel from '../../../pages/ControlPanel'
 import Home from '../../../pages/Home'
@@ -18,6 +18,7 @@ const Main = () => {
           <Route path="/Controls" element={<ControlPanel />} />
           <Route path="/Logs/RecordTable/:month" element={<RecordMonthHolder />} />
           <Route path="/table" element={<RecordMonthTable />} />
+          <Route path="/Analytics/:parameter" element={<Analytics />} />
         </Routes>
     </div>
   )

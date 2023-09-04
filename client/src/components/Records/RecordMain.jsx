@@ -41,7 +41,7 @@ const RecordMain = () => {
   return (
     <div className="record-main">
       
-              <Item style={{  height: '13rem', margin: '3rem 4rem',
+              <Item style={{  height: '13rem', margin: '5rem 4rem',
                 padding: '2rem 1rem', alignItems: 'center'}} >
                   <div className="head" 
                       style={{ marginTop: '2rem', display: 'grid', gridTemplateColumns: '1fr 1fr'}}>
@@ -49,8 +49,8 @@ const RecordMain = () => {
                       style={{  fontFamily: 'Poppins, sans-serif', 
                         fontWeight: '400', lineHeight: '0.8', 
                         display: 'flex', textAlign: 'start', width: '6rem'}} >
-                        <span style={{ color:'#FFFF', width: '25rem'}}>RECORD</span>
-                        <span style={{ color:'#66B2FF', width: '25rem', color: '#66B2FF'}}>LOGS</span>
+                        <span style={{ color:'#FFFF', width: '25rem'}}>LOG</span>
+                        <span style={{ color:'#66B2FF', width: '25rem', color: '#66B2FF'}}>ENTRIES</span>
                     </div>
                     <div style={{marginTop:'-9rem', paddingLeft:'18rem'}}>
                       <img src={record_illustration} alt="record_item" className="record_illus"

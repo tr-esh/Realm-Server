@@ -1,0 +1,61 @@
+.predictions-container {
+    display: flex;
+    gap: 20px;
+    font-family: 'Poppins';
+  }
+  .predictHome-container{
+    display: flex;
+    gap: 20px;
+    font-family: 'Poppins';
+    margin: auto;
+  }
+  .prediction {
+    border: none;
+    padding: 10px;
+  }
+  
+  .Days{ 
+    text-transform: uppercase;
+    font-weight: 400;
+    font-size: 0.7rem;
+  }
+  .home-days{ 
+    text-transform: uppercase;
+    font-weight: 400;
+    font-size: 0.7rem;
+  }
+  .Results{
+    color: #6C93D8;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  @keyframes loading {
+    0%, 100% {
+      content: '•';
+    }
+    33% {
+      content: '••';
+    }
+    66% {
+      content: '•••';
+    }
+  }
+
+  .loading-animation::after {
+    content: '';
+    display: inline-block;
+    width: 1em;
+    animation: loading 1s infinite;
+  }
+  .loading-state{
+    margin: auto;
+  }
+
+  .home-result{
+    color: #6C93D8;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  .home-load{
+    margin: auto;
+  }

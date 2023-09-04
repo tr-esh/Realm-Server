@@ -91,5 +91,58 @@ const fetchParameters = async (req, res) => {
       res.status(200).json({ temperatureMean, turbidityMean, phMean });
     };
     
+    const fetchAbnormalParameters = async (req, res) => {
+      try {
+        const [temp, turbid, phlevel] = await Promise.all([
+          TemperatureReading.find({}),
+          TurbidityReading.find({}),
+          phLevelReading.find({})
+        ]);
+    
+        const parameters = [...temp, ...turbid, ...phlevel];
+    
+        const data = parameters
+          .filter(parameter => parameter.temperature_value !== undefined || parameter.ntu_value !== undefined || parameter.ph_value !== undefined)
+          .map(({ _id, sensor_type, parameter_name, temperature_value, ntu_value, ph_value, status, createdAt }) => {
+            const valueArray = [temperature_value, ntu_value, ph_value].filter(value => value >= 0);
+            return {
+              id: _id,
+              sensor: sensor_type,
+              type: parameter_name,
+              value: valueArray,
+              status,
+              createdAt,
+            };
+          });
+    
+        // Calculate the count of abnormal data points for each parameter
+        const abnormalCounts = {
+          temperature: data.filter(({ type, value }) => type === 'temperature' && (value < 15 || value > 30)).length,
+          turbidity: data.filter(({ type, value }) => type === 'turbidity' && (value < 1000 || value > 5000)).length,
+          ph: data.filter(({ type, value }) => type === 'ph' && (value < 7.5 || value > 8.5)).length,
+        };
+    
+        // Determine which parameter has the most abnormal data points
+        let mostAbnormalParameter = '';
+        let maxAbnormalCount = 0;
+        for (const parameter in abnormalCounts) {
+          if (abnormalCounts[parameter] > maxAbnormalCount) {
+            mostAbnormalParameter = parameter;
+            maxAbnormalCount = abnormalCounts[parameter];
+          }
+        }
+    
+        res.status(200).json({
+          data: data,
+          mostAbnormalParameter: mostAbnormalParameter,
+          maxAbnormalCount: maxAbnormalCount,
+        });
+      } catch (error) {
+        console.error(error); // Log the error for debugging purposes
+        res.status(500).json({ message: 'Cannot get all the request' });
+      }
+    };
+    
 
-module.exports = { fetchTemp, fetchTurbidity, fetchph, fetchParameters, fetchHourlyMeans}
+
+module.exports = { fetchTemp, fetchTurbidity, fetchph, fetchParameters, fetchHourlyMeans, fetchAbnormalParameters}
