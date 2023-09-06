@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react'
 import '../styles/Sidebar.css'
 import { NavLink, useLocation } from "react-router-dom"
 import { SidebarData } from '../../Data/Data'
-import LinearProgressBar from './ComparativeResult'
 import AccuracyRate from './AccuracyRate'
 const realm_lg = new URL('../Sidebar/realm_text_logo.png', import.meta.url)
 const check_icn = new URL('../../img/icons8-check-64.png', import.meta.url)
-const comment_icn = new URL('../../img/icons8-comment-96.png', import.meta.url)
 
 const Sidebar = () => {
   
@@ -76,26 +74,14 @@ const Sidebar = () => {
                 Overview
               </div>
 
-              <div className="comparative" style={{display:'flex'}}>
-                <div className="head-title">
-                  <img src={check_icn} alt="check_icon" className="check_icon"/>
-                  <div className="for-name">
-                    Comparative Result
-                  </div>
-                </div>
-                <div className="progress-bar">
-                  <LinearProgressBar/>
-                </div>
-              </div>
-
               <div className="responses" style={{display:'flex'}}>
                 <div className="head-title">
-                  <img src={comment_icn} alt="comment_icon" className="comment_icon"/>
+                  <img src={check_icn} alt="check_icon" className="check_icon"/>
                   <div className="res-name">
                     Accuracy Result
                   </div>
                 </div>
-                <div className="progress-bar-res">
+                <div className="progress-bar">
                   <AccuracyRate/>
                 </div>
               </div>

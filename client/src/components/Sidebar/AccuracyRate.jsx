@@ -1,40 +1,163 @@
 import React, { useState, useEffect } from 'react';
 
 const AccuracyRate = () => {
-  const [progress, setProgress] = useState(0);
+    const [progress, setProgress] = useState({
+      temperature: 0,
+      turbidity: 0,
+      pH: 0,
+    });
 
-  useEffect(() => {
-    const targetAccuracy = 63; // Target accuracy in percentage
-    const totalSteps = 100; // Total steps to reach 100%
+    const [data, setData] = useState([]);
+    const [accuracyData, setAccuracyData] = useState({
+      temperature: 0,
+      turbidity: 0,
+      pH: 0,
+    });
 
-    // Simulate the progress by incrementing it over time
-    const interval = setInterval(() => {
-      if (progress < targetAccuracy) {
-        setProgress(progress + 1); // Increment by 1 for smoother animation
-      } else {
-        clearInterval(interval);
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const response = await fetch('/api/realm/alldata');
+          const responseData = await response.json();
+  
+          const today = new Date();
+          const yesterday = new Date(today);
+          yesterday.setDate(today.getDate() - 1);
+  
+          const formattedYesterday = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+          const yesterdayData = responseData.filter(data => data.createdAt.split('T')[0] === formattedYesterday);
+  
+          const mostFrequentTemp = getMostFrequentValue(yesterdayData, 'temperature');
+          const mostFrequentTurbid = getMostFrequentValue(yesterdayData, 'turbidity');
+          const mostFrequentPh = getMostFrequentValue(yesterdayData, 'pH');
+  
+          const tempAccuracy = await fetchPredictedValueAndCalculateAccuracy('temperature', mostFrequentTemp, formattedYesterday);
+          const turbidAccuracy = await fetchPredictedValueAndCalculateAccuracy('turbidity', mostFrequentTurbid, formattedYesterday);
+          const phAccuracy = await fetchPredictedValueAndCalculateAccuracy('ph', mostFrequentPh, formattedYesterday);
+  
+          setAccuracyData({
+            temperature: tempAccuracy,
+            turbidity: turbidAccuracy,
+            pH: phAccuracy,
+          });
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+  
+      fetchData();
+    }, []);
+  
+    const getMostFrequentValue = (data, type) => {
+      let valueField;
+      switch (type) {
+          case 'temperature':
+              valueField = 'temperature_value';
+              break;
+          case 'turbidity':
+              valueField = 'ntu_value';
+              break;
+          case 'pH':
+              valueField = 'ph_value';
+              break;
+          default:
+              throw new Error(`Unknown type: ${type}`);
       }
+  
+      const typeData = data.filter(d => d.parameter_name === type);
+      const frequency = {};
+  
+      typeData.forEach(d => {
+          if (frequency[d[valueField]]) {
+              frequency[d[valueField]]++;
+          } else {
+              frequency[d[valueField]] = 1;
+          }
+      });
+  
+      if (Object.keys(frequency).length === 0) {
+          return 0;  // Return 0 or a suitable default value.
+      }
+  
+      let mostFrequentValue = Object.keys(frequency).reduce((a, b) => frequency[a] > frequency[b] ? a : b);
+      return parseFloat(mostFrequentValue);
+  };
+  
+  
+  const fetchPredictedValueAndCalculateAccuracy = async (metricType, actualValue, formattedYesterday) => {
+    const response = await fetch(`/api/realm/predictnext/${metricType}`);
+    const predictionsArray = await response.json();
+    let predictedValueForDate;
+
+    const predictionForDate = predictionsArray.find(prediction => {
+        const predictionDate = new Date(prediction.values.timestamp);
+        return `${predictionDate.getFullYear()}-${String(predictionDate.getMonth() + 1).padStart(2, '0')}-${String(predictionDate.getDate()).padStart(2, '0')}` === formattedYesterday;
+    });
+
+    if (predictionForDate) {
+        predictedValueForDate = predictionForDate.values.value;
+    } else {
+        console.error(`No prediction found for date: ${formattedYesterday}`);
+    }
+
+    return calculateAccuracy(predictedValueForDate, actualValue);
+};
+
+  
+    const calculateAccuracy = (predicted, actual) => {
+      if (typeof predicted !== "number" || typeof actual !== "number" || actual === 0) {
+          console.error('Invalid values for accuracy calculation:', predicted, actual);
+          return 0;  // Return 0% accuracy if the data is not valid.
+      }
+      return (1 - Math.abs(predicted - actual) / actual) * 100;
+  };
+  
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+        setProgress(prev => {
+            return {
+                temperature: parseFloat(Math.min(prev.temperature + 1, accuracyData.temperature).toFixed(2)),
+                turbidity: parseFloat(Math.min(prev.turbidity + 1, accuracyData.turbidity).toFixed(2)),
+                pH: parseFloat(Math.min(prev.pH + 1, accuracyData.pH).toFixed(2))
+            }
+        });
+        if (progress.temperature >= accuracyData.temperature && progress.turbidity >= accuracyData.turbidity && progress.pH >= accuracyData.pH) {
+            clearInterval(interval);
+        }
     }, 50);
 
     return () => clearInterval(interval);
-  }, [progress]);
+}, [accuracyData]);
 
-  // Calculate the width of the filled progress bar based on the current percentage
-  const filledWidth = (progress / 100) * 100 + '%';
 
-  // Create a CSS class for the progress bar to achieve the desired effect
-  const progressBarStyle = {
-    width: '100%',
-    height: '0.3rem',
-    background: `linear-gradient(to right, #4E79B4 ${filledWidth}, #0d2135 ${filledWidth})`,
+  
+    const generateProgressBar = (paramProgress, paramName) => {
+      const filledWidth = (paramProgress / 100) * 100 + '%';
+      const progressBarStyle = {
+        width: '100%',
+        height: '0.3rem',
+        background: `linear-gradient(to right, #4E79B4 ${filledWidth}, #0d2135 ${filledWidth})`,
+      };
+  
+      return (
+        <div key={paramName}>
+          <p style={{ fontSize: '0.7rem', paddingLeft: '0.5rem', textTransform: 'uppercase' }}>{paramName}</p>
+          <div className="progress-bar" style={{ padding: '1rem' }}>
+            <div className="progress-bar-fill" style={progressBarStyle}></div>
+            <div className="progress-bar-label" style={{ fontSize: '0.8rem', paddingTop: '0.5rem' }}>{`${paramProgress}% accuracy of 100`}</div>
+          </div>
+        </div>
+      );
+    }
+  
+    return (
+      <div>
+        {generateProgressBar(progress.temperature, 'Temperature')}
+        {generateProgressBar(progress.turbidity, 'Turbidity')}
+        {generateProgressBar(progress.pH, 'pH')}
+      </div>
+    );
   };
-
-  return (
-    <div className="progress-bar" style={{padding: '1rem'}}>
-      <div className="progress-bar-fill" style={progressBarStyle}></div>
-      <div className="progress-bar-label" style={{fontSize: '0.8rem', paddingTop: '0.5rem'}}>{`${progress}% accuracy of 100`}</div>
-    </div>
-  );
-};
 
 export default AccuracyRate;

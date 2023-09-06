@@ -13,19 +13,10 @@ import DashTime from '../DashTime';
 import DashDate from '../DashDate';
 import DashClock from '../DashClock';
 import EventNoteRoundedIcon from '@mui/icons-material/EventNoteRounded';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import { Bar } from 'react-chartjs-2';
 import TemperatureHome from '../Analytic/Predictive/TemperatureHome';
 import TurbidityHome from '../Analytic/Predictive/TurbidityHome';
 import PhHome from '../Analytic/Predictive/PhHome';
+import FrequencyData from './FrequencyData';
 
 
 
@@ -43,14 +34,7 @@ const Item = styled(Paper)(({ theme }) => ({
   })
 );
 
- ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+
 
 const DashboardMain = () => {
 
@@ -60,7 +44,7 @@ const DashboardMain = () => {
   const [turbidity, setTurbidity] = useState([])
   const [readings, setReadings]= useState([])
   const [isLoading, setIsLoading] = useState(true);
-  const [frequencyData, setFrequencyData] = useState([]);
+
   
   const [latestReadings, setLatestReadings] = useState([]);
   const [overallIndex, setOverallIndex] = useState(null);
@@ -80,14 +64,12 @@ const DashboardMain = () => {
     
 
       const fetchData = async () => {
-            const [res1, res2, res3] = await Promise.all([
+            const [res1, res3] = await Promise.all([
               fetch('/api/realm/fetchParameters'),
-              fetch('/api/realm/bardata'),
               fetch('api/realm/fetchAllParameters')
             ]);
 
             const json1 = await res1.json()
-            const json2 = await res2.json()
             const json3 = await res3.json()
 
           if (res1.ok){
@@ -95,9 +77,6 @@ const DashboardMain = () => {
             const filteredData = json1.filter(reading => reading.ntu_value !== null);
             setReadings(filteredData);
             setIsLoading(false)
-          }
-          if (res2.ok){
-            setFrequencyData(json2);
           }
           if (res3.ok){
             setLatestReadings(json3);
@@ -147,10 +126,6 @@ const DashboardMain = () => {
     }
   }, [latestReadings]);
 
-
-
-  
-const graphIllustration = new URL('../../img/graph_illustration.png', import.meta.url)
 
 
 
@@ -423,64 +398,12 @@ const graphIllustration = new URL('../../img/graph_illustration.png', import.met
 
             <Grid xs={6} md={7}
             item className="card">
-              <Item style={{  height: '15rem' }}> 
+              <Item style={{  height: '15rem'}}> 
 
-                    <div style={{ maxWidth: '500px', margin: '0 auto'}}>
-                          {frequencyData ? (
-                            <Bar
-                              data={{
-                                labels: frequencyData.map((data) => data.day),
-                                datasets: [
-                                  {
-                                    label: 'Temperature',
-                                    data: frequencyData.map((data) => data.temperature),
-                                    backgroundColor: '#4E79B4',
-                                    borderRadius: 5,
-                                  },
-                                  {
-                                    label: 'Turbidity',
-                                    data: frequencyData.map((data) => data.turbidity),
-                                    backgroundColor: '#6F93D3',
-                                    borderRadius: 5,
-                                  },
-                                  {
-                                    label: 'pH',
-                                    data: frequencyData.map((data) => data.pH),
-                                    backgroundColor: '#9FB9DD',
-                                    borderRadius: 5,
-                                  },
-                                ],
-                              }}
-                              options={{
-                                title: {
-                                  display: true,
-                                  text: 'Weekly High Parameter Frequency',
-                                  fontSize: 20,
-                                },
-                                legend: {
-                                  display: true,
-                                },
-                                scales: {
-                                  x: {
-                                    stacked: false,
-                                    barPercentage: 0.7,
-                                  },
-                                  y: {
-                                    display: false, // Remove the y-axis label
-                                    beginAtZero: true,
-                                    stacked: false,
-                                    grid: {
-                                      display: false, // Remove gridlines
-                                    },
-                                  },
-                                },
-                                barThickness: 20, // Set the desired width of the bars (in pixels)
-                                categoryPercentage: 1.0, // Set the width of the bars relative to the available space
-                              }}
-                            />
-                          ) : (
-                            <img style={{width:'20rem', display:'block', margin:'auto'}} src={graphIllustration} alt="No data available" />
-                          )}
+                    <div style={{ width: '35rem', margin: 'auto'}}>
+                      <p className='anomaly-tag'> DAILY <span className='anomaly-san'> ANOMALY </span> TRACKING </p>
+
+                    <FrequencyData />
                         </div>
               </Item>
               </Grid>

@@ -8,6 +8,7 @@ import {
     Area,
     ResponsiveContainer,
 } from 'recharts';
+import '../../styles/Analysis.css'
 
 const TemperaturePrediction = () => {
     const [predictions, setPredictions] = useState([]);
@@ -89,6 +90,19 @@ const TemperaturePrediction = () => {
         );
     };
 
+
+    
+    const CustomTooltip = ({ active, payload, label }) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className="custom-tooltip" style={{ backgroundColor: '#0d2135', width: '15rem', border: 'none'}}>
+                    <p className="label" >{`Predicted Reading: ${payload[0].value}`}</p>
+                </div>
+            );
+        }
+        return null;
+    }; 
+
     return (
         <div style={{ width: '100%', height: '70%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <ResponsiveContainer>
@@ -106,11 +120,11 @@ const TemperaturePrediction = () => {
                         tick={false}
                         width={0}
                     />
-                    <Tooltip />
+                    <Tooltip content={<CustomTooltip />} />
                     <Area
                         type="monotone"
                         dataKey="predictedTemperature"
-                        name="Predicted Average Reading"
+                        name="Predicted Reading"
                         stroke="#8A6DC1"
                         fill="#8A6DC1"
                         fillOpacity={0.3}

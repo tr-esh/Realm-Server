@@ -75,21 +75,9 @@ h1 {
     text-align: center;
 }
 
-.comparative{
-    margin-left: 2rem;
-    flex-direction: column;
-}
-
 .head-title{
     display: flex;
     flex-direction: row;
-}
-
-.for-name {
-    font-weight: 100;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    margin: 8px 5px;
 }
 
 .check_icon {
@@ -113,18 +101,9 @@ h1 {
     font-size: 0.8rem;
     text-transform: uppercase;
     margin: 5px 8px;
+    padding-bottom: 0.9rem;
 }
 
-.comment_icon {
-    width: 1.6rem;
-    height: 1.5rem;
-    margin-right: 0.5rem;
-}
-
-.progress-bar-res {
-    margin-left: -6px;
-    margin-top: -6px;
-}
 
 .title {
     padding-left: 1rem;

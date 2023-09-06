@@ -57,12 +57,20 @@ const TurbidityChart = () => {
     fetchTurbidityData();
   }, []);
 
+  const tooltipStyle = {
+    fontFamily: 'Poppins', // Replace with the desired font family
+    fontSize: '0.9rem',
+    fontWeight: '500',
+    backgroundColor: '#0d2135',
+    border: 'none'
+  };
+  
   return (
     <div  style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
     <ResponsiveContainer>
       <LineChart data={turbidityData}>
         <XAxis dataKey="date" />
-        <Tooltip />
+        <Tooltip contentStyle={tooltipStyle} />
         <Line type="monotone" dataKey="ntu_value" name="Turbidity" stroke="#F1918F" strokeWidth={3} dot={{ r: 3 }} />
       </LineChart>
       </ResponsiveContainer>

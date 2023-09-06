@@ -57,12 +57,21 @@ const PhLevelChart = () => {
     fetchPhData();
   }, []);
 
+  const tooltipStyle = {
+    fontFamily: 'Poppins', // Replace with the desired font family
+    fontSize: '0.9rem',
+    fontWeight: '500',
+    backgroundColor: '#0d2135',
+    border: 'none'
+  };
+  
+  
   return (
     <div  style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
     <ResponsiveContainer>
       <LineChart data={phData}>
         <XAxis dataKey="date" />
-        <Tooltip />
+        <Tooltip contentStyle={tooltipStyle} />
         <Line type="monotone" dataKey="ph_value" name="pH Level" stroke="#F5D087" strokeWidth={3} dot={{ r: 3 }} />
       </LineChart>
       </ResponsiveContainer>

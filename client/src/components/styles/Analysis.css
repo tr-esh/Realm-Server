@@ -1,0 +1,10 @@
+.custom-tooltip{
+    display: table; 
+    font-family: 'Poppins';
+}
+
+.label{
+    text-align:center; 
+    vertical-align: middle;
+    display: table-cell;
+}

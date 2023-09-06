@@ -95,8 +95,34 @@
   .custom-progress-bar .CircularProgressbar-text {
     font-weight: 700;
 }
-
-
+.anomaly-tag{
+    font-family: 'Poppins';
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-top: 0.7rem;
+    text-align: left;
+    margin-left: 0.8rem;
+}
+.anomaly-san{
+    color: #66B2FF;
+}
+.custom-tooltip{
+    font-family: 'Poppins';
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.7rem;
+    background-color: #0d2135;
+    font-size: 0.8rem;
+    display: table; 
+}
+.tooltip-value{
+    text-align:center; 
+    vertical-align: middle;
+    display: table-cell;
+}
+.frequency-chart{
+    margin-top: 0.3rem;
+}
 
 @media screen and (max-width: 1200px ) {
     .item{
