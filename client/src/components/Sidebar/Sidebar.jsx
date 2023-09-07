@@ -3,8 +3,9 @@ import '../styles/Sidebar.css'
 import { NavLink, useLocation } from "react-router-dom"
 import { SidebarData } from '../../Data/Data'
 import AccuracyRate from './AccuracyRate'
+import AutoGraphRoundedIcon from '@mui/icons-material/AutoGraphRounded';
 const realm_lg = new URL('../Sidebar/realm_text_logo.png', import.meta.url)
-const check_icn = new URL('../../img/icons8-check-64.png', import.meta.url)
+
 
 const Sidebar = () => {
   
@@ -12,6 +13,23 @@ const Sidebar = () => {
     const location = useLocation();
     const activeLink = 'hover: rgb(21, 101, 192)';
     const normalLink = 'hover: rgb(21, 101, 192)';
+
+    function getYesterdayDate() {
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+  
+      // Format the date to 'Month Date, Year' (e.g., "September 7, 2023")
+      const formattedDate = yesterday.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+  
+      return formattedDate;
+    }
+  
+    const yesterdayDate = getYesterdayDate();
 
     useEffect(() => {
       const storedSelected = localStorage.getItem('selected');
@@ -70,15 +88,13 @@ const Sidebar = () => {
             
           <div className="Sign">
             <div className="holder">
-              <div className="header-overview">
-                Overview
-              </div>
 
               <div className="responses" style={{display:'flex'}}>
                 <div className="head-title">
-                  <img src={check_icn} alt="check_icon" className="check_icon"/>
+                  <AutoGraphRoundedIcon style={{fontSize: '2rem', color: '#66B2FF'}}/>
                   <div className="res-name">
-                    Accuracy Result
+                    <p className='accuracy'> ACCURACY RESULT </p> 
+                    <span className='accuracy-time'> as of {yesterdayDate}</span>
                   </div>
                 </div>
                 <div className="progress-bar">

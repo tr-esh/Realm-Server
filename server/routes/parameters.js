@@ -1,7 +1,7 @@
 const express = require('express')
 const { postTemperature, postTurbidity, postpHLevel, getTemp, getTurbidity, getph, getParameters, getReadings, getallData} = require('../controllers/parameterReadingsContoller');
 const { fetchTemp, fetchTurbidity, fetchph, fetchParameters, getHourlyMean, fetchAbnormalParameters} = require('../controllers/gettersController');
-const { allParameters, getAllParameters, barParameters } = require('../controllers/streamsController');
+const { allParameters, getAllParameters, saveAccuracyRate } = require('../controllers/streamsController');
 const { highParameters } = require('../controllers/highValue');
 const { calculateAverage } = require('../controllers/calculateController');
 const { fetchLatestPrediction } = require('../controllers/predictionController');
@@ -45,6 +45,9 @@ router.get('/calcuAverage', calculateAverage)
 //prediction
 router.get('/predictions/:metricType', fetchLatestPrediction);
 router.get('/predictnext/:metricType', fetchNextPrediction);
+
+//save from frontend
+router.post('/sendAccuracyRate', saveAccuracyRate);
 
 
 module.exports = router 

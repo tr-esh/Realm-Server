@@ -9,7 +9,15 @@
     transition: all 0.5s ease;
     width: 19rem;
 }
-
+.accuracy{
+    color: #66B2FF;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+.accuracy-time{
+    font-size: 0.7rem;
+    padding-top: -5rem;
+}
 h1 {
     margin-top: 2rem;
     padding: 0 2rem;
@@ -91,15 +99,13 @@ h1 {
 }
 
 .responses{
-    margin-top: 1.25rem;
-    margin-left: 2rem;
+    padding: 1.5rem;
     flex-direction: column;
 }
 
 .res-name {
     font-weight: 100;
     font-size: 0.8rem;
-    text-transform: uppercase;
     margin: 5px 8px;
     padding-bottom: 0.9rem;
 }

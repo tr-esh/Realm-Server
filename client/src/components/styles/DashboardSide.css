@@ -23,6 +23,22 @@
     align-items: center;
 
 }
+.notification-history{
+    margin-left: 2rem;
+    background-color: #15314e;
+    height: 95px;
+    border-radius: 1.5rem;
+    margin-top: 0.9rem;
+    font-family: 'Poppins';
+    display: flex;
+    justify-content: center;
+    align-items: center;
+   
+    color: white;
+}
+.realm-not{
+    font-size: 0.7rem;
+}
 .warning-holder{
     display: flex;
     flex-direction: column;

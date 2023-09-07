@@ -145,14 +145,14 @@ const DashboardMain = () => {
                       <div  className='headings'
                         style={{  fontFamily: 'Poppins, sans-serif', 
                         fontWeight: '600', lineHeight: '0.9', 
-                        padding: '0.5rem 0.3rem'}}> 
+                        padding: '1rem 0.3rem'}}> 
                             
                             <span style={{  fontSize: '1.5rem', 
                             fontWeight:'700' }}
                             >PHYSICOCHEMICAL</span>
 
                             <span style={{  fontSize: '3rem', 
-                            fontWeight:'700', color:'#0A1929', paddingBottom: '1.5rem' }}
+                            fontWeight:'700', color:'#0A1929', paddingBottom: '2rem' }}
                             >STATUS</span>
                             
                             {latestReadings.length === 3 && (
@@ -180,6 +180,7 @@ const DashboardMain = () => {
                                   textSize: '0.6rem',
                                   textColor: "#0A1929",
                                   pathColor: getPathColor(overallIndex * 100),
+                                  trailColor: '#436f9c',
                                   fontFamily: 'Poppins'
                               })}
                           />

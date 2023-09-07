@@ -42,7 +42,10 @@ const Item = styled(Paper)(({ theme }) => ({
   const location = useLocation();
   const filteredData = location.state?.data || [];
   
-  
+  // Extract month name from the data
+  const monthName = filteredData.length > 0 
+                    ? moment(filteredData[0].createdAt).format('MMMM') 
+                    : '';
 
   
   const navigate = useNavigate(); 
@@ -114,29 +117,21 @@ const Item = styled(Paper)(({ theme }) => ({
                                 paddingLeft:'2rem'}} >
 
                         <div style={{ display: 'flex' }}>
-                            <span onClick={navigatetoRecordLogs}  className='backhome' style={{marginRight: '0.7rem'}}>
-                              <Tooltip title="Back" arrow style={{fontFamily:'Poppins'}}> 
+                          <span onClick={navigatetoRecordLogs} className='backhome' style={{marginRight: '0.7rem'}}>
+                            <Tooltip title="Back" arrow style={{fontFamily:'Poppins'}}> 
                               <KeyboardReturnRoundedIcon className='home-icon' sx={{fontSize:'2rem', color: '#BDD2CF', width: '3rem'}}/>
                             </Tooltip>
-                            </span>    
-                            <div style={{ display: 'flex', 
-                                          flexDirection: 'column' }}>
-                              <span style={{ color:'#66B2FF', 
-                                            width: '25rem', 
-                                            fontSize:'2rem', paddingTop:'0.4rem'}}>
-                                        
-                                              RECORD LOGS
-                              </span>
-
-                              <span style={{ color:'#FFFF', 
-                                              width: '25rem', 
-                                              fontSize:'13px',
-                                              fontWeight: '400',
-                                              paddingTop: '0.3rem'}}>
-                                              Never miss a beat with our log tracking solution.
-                              </span>
-                            </div>
+                          </span>    
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span style={{ color:'#66B2FF', width: '25rem', fontSize:'2rem', paddingTop:'0.4rem'}}>
+                              {monthName} Logs  {/* Here's the change */}
+                            </span>
+                            <span style={{ color:'#FFFF', width: '25rem', fontSize:'13px', fontWeight: '400', paddingTop: '0.7rem'}}>
+                              Never miss a beat with our log tracking solution.
+                            </span>
+                          </div>
                         </div>
+
 
 
                         

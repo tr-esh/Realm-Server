@@ -82,9 +82,6 @@
     height: 12rem;
 }
 
-.CircularProgressbar-trail {
-    display: none;
-}
 
 .solid{
     border-top: 3px solid #7da4cc;

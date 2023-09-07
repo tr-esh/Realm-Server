@@ -1,6 +1,7 @@
 const TemperatureReading = require('../models/temperatureModel')
 const TurbidityReading = require('../models/turbidityModel')
 const phLevelReading = require('../models/phLevelModel')
+const DataModel = require('../models/accuracyRateData')
 
 
   const allParameters = async (req, res) => {
@@ -151,8 +152,21 @@ const phLevelReading = require('../models/phLevelModel')
   //   }  
   // };
   
+  const saveAccuracyRate = async (req, res) => {
+    try {
+      const accuracyData = new DataModel({
+        timestamp: req.body.timestamp,
+        temperature: req.body.temperature,
+        turbidity: req.body.turbidity,
+        pH: req.body.pH
+    });
+    await accuracyData.save();
+    
+        res.status(200).send({ message: 'Data saved successfully' });
+    } catch (error) {
+        res.status(500).send({ message: 'Error saving data', error });
+    }
+  }
   
-
   
-  
-  module.exports = { allParameters, getAllParameters}
+  module.exports = { allParameters, getAllParameters, saveAccuracyRate}
