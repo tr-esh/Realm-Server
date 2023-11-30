@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Text
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer, 
+  Text
 } from 'recharts';
 import '../../styles/MonthParamStyle.css'
 
@@ -36,13 +43,16 @@ const ParameterStacked = () => {
         });
   
         // Determine counts for each parameter
-        const temperatureData = selectedMonthData.filter(entry => entry.type === 'temperature');
-        const pHData = selectedMonthData.filter(entry => entry.type === 'pH');
-        const turbidityData = selectedMonthData.filter(entry => entry.type === 'turbidity');
+        const temperatureData = selectedMonthData.filter(entry => 
+                                     entry.type === 'temperature');
+        const pHData = selectedMonthData.filter(entry => 
+                                     entry.type === 'pH');
+        const turbidityData = selectedMonthData.filter(entry => 
+                                     entry.type === 'turbidity');
   
-        const tempCounts = calculatePercentage(temperatureData, 10, 35);
-        const turbidCounts = calculatePercentage(turbidityData, 1000, 5000);
-        const phCounts = calculatePercentage(pHData, 7.5, 8.5);
+        const tempCounts = calculatePercentage(temperatureData, 10, 22);
+        const turbidCounts = calculatePercentage(turbidityData, 0.1, 5);
+        const phCounts = calculatePercentage(pHData, 6.8, 8.5);
 
         const totalOutliersCount =
         tempCounts.outliers + turbidCounts.outliers + phCounts.outliers;
@@ -55,9 +65,18 @@ const ParameterStacked = () => {
         setNormalCount(totalNormal);
   
         setData([
-          { name: 'Temperature', Outliers: tempCounts.outliers, 'Normal Data': tempCounts.normal },
-          { name: 'Turbidity', Outliers: turbidCounts.outliers, 'Normal Data': turbidCounts.normal },
-          { name: 'pH', Outliers: phCounts.outliers, 'Normal Data': phCounts.normal },
+          { name: 'Temperature', 
+            Outliers: tempCounts.outliers, 
+            'Normal Data': tempCounts.normal 
+          },
+          { name: 'Turbidity', 
+            Outliers: turbidCounts.outliers, 
+            'Normal Data': turbidCounts.normal 
+          },
+          { name: 'pH', 
+            Outliers: phCounts.outliers, 
+            'Normal Data': phCounts.normal 
+          },
         ]);
   
       } catch (error) {
@@ -81,14 +100,20 @@ const ParameterStacked = () => {
     ).length;
     const normal = total - outliers;
     return {
-      outliers: outliers, // change from percentage to actual count
-      normal: normal     // change from percentage to actual count
+      outliers: outliers,
+      normal: normal  
     };
   };
 
   const CustomizedAxisTick = ({ x, y, payload }) => {
     return (
-      <Text x={x} y={y} textAnchor="middle" verticalAnchor="start" fontFamily="Poppins" fontWeight= '400' fontSize= '0.7rem' fill= '#ffff'>
+      <Text x={x} y={y} 
+            textAnchor="middle" 
+            verticalAnchor="start" 
+            fontFamily="Sk-Modernist-Regular" 
+            fontWeight= '400' 
+            fontSize= '0.7rem' 
+            fill= '#ffff'>
         {payload.value.toUpperCase()}
       </Text>
     );
@@ -104,12 +129,23 @@ const ParameterStacked = () => {
       isTop 
     } = props;
   
-    const radius = 5;  // Adjust as needed for the desired roundness
+    const radius = 5;
   
     const path = isTop ? 
-      `M${x},${y + height} L ${x + width},${y + height} L ${x + width},${y + radius} Q ${x + width},${y} ${x + width - radius},${y} L ${x + radius},${y} Q ${x},${y} ${x},${y + radius} L ${x},${y + height}`
+      `M${x},${y + height} L ${x + width},
+       ${y + height} L ${x + width},
+       ${y + radius} Q ${x + width},
+       ${y} ${x + width - radius},
+       ${y} L ${x + radius},
+       ${y} Q ${x},${y} ${x},
+       ${y + radius} L ${x},
+       ${y + height}`
     :
-      `M${x},${y + height} L ${x + width},${y + height} L ${x + width},${y} L ${x},${y} L ${x},${y + height}`;
+      `M${x},${y + height} L ${x + width},
+       ${y + height} L ${x + width},
+       ${y} L ${x},
+       ${y} L ${x},
+       ${y + height}`;
   
     return <path d={path} fill={fill} />;
   };
@@ -118,22 +154,52 @@ const ParameterStacked = () => {
   
 
   return (
-    <div className="chart-container" style={{ display: 'flex', justifyContent: 'center', height: '100%', width: '100%' }}>
-      <div className="chart-wrapper" style={{ width: '95%' }}>
-        <div style={{ paddingTop: '-40rem', fontFamily: 'Poppins', fontSize: '0.7rem', fontWeight: '500', textTransform:'uppercase', textAlign: 'right' }}>
+    <div className="chart-container" 
+         style={{ display: 'flex', 
+                  justifyContent: 'center', 
+                  height: '100%', 
+                  width: '100%' }}>
+      <div className="chart-wrapper" 
+           style={{ width: '95%' }}>
+        <div style={{ paddingTop: '-40rem', 
+                      fontFamily: 'Sk-Modernist-Regular', 
+                      fontSize: '0.7rem', 
+                      fontWeight: '500', 
+                      textTransform:'uppercase', 
+                      textAlign: 'right' }}>
           Data Class Breakdown
         </div>
-        <div className='outlier-counts' style={{ fontSize: '2rem', fontWeight: '700', fontFamily: 'Poppins', textAlign: 'right', marginTop: '-0.5rem'}}>
+        <div className='outlier-counts' 
+            style={{ fontSize: '2rem', 
+                     fontWeight: '700', 
+                     fontFamily: 'Sk-Modernist-Regular', 
+                     textAlign: 'right', 
+                     marginTop: '-0.5rem', color: '#8cacff'}}>
           {totalOutliers}
           </div>
-          <div style={{ fontFamily: 'Poppins', fontSize: '0.7rem', fontWeight: '300', textTransform: 'uppercase', textAlign: 'right', marginTop: '-0.5rem'}}> 
+          <div style={{ fontFamily: 'Sk-Modernist-Regular', 
+                        fontSize: '0.7rem', 
+                        fontWeight: '300', 
+                        textTransform: 'uppercase', 
+                        textAlign: 'right', 
+                        marginTop: '-0.5rem'}}> 
           OUTLIERS
           </div>
 
-          <div className='outlier-counts' style={{ fontSize: '2rem', fontWeight: '700', fontFamily: 'Poppins', textAlign: 'right', marginTop: '0.2rem'}}>
+          <div className='outlier-counts' 
+               style={{ fontSize: '2rem', 
+                        fontWeight: '700', 
+                        fontFamily: 'Sk-Modernist-Regular', 
+                        textAlign: 'right', 
+                        marginTop: '0.2rem', color: '#8cacff'}}>
           {normalCount}
           </div>
-          <div style={{ fontFamily: 'Poppins', fontSize: '0.7rem', fontWeight: '300', textTransform: 'uppercase', textAlign: 'right', marginTop: '-0.5rem'}}> 
+          <div style={{ fontFamily: 'Sk-Modernist-Regular', 
+                        fontSize: '0.7rem', 
+                        fontWeight: '300', 
+                        textTransform: 'uppercase', 
+                        textAlign: 'right', 
+                        marginTop: '-0.5rem'}}> 
           NORMAL DATA
           </div>
         <ResponsiveContainer className="stack-responsive-container">
@@ -143,10 +209,16 @@ const ParameterStacked = () => {
             barSize={30}
             barCategoryGap={0}
           >
-            <XAxis dataKey="name" tick={<CustomizedAxisTick />} tickLine={false} width={10}/>
+            <XAxis dataKey="name" 
+                   tick={<CustomizedAxisTick />} 
+                   tickLine={false} 
+                   width={10}/>
             <YAxis 
-                    tick={{ fontSize: 10, fontFamily: 'Poppins', fill: '#ffff', fontWeight: '400'}} // Change font color here
-                    axisLine={false} // Remove the level line
+                    tick={{ fontSize: 10, 
+                            fontFamily: 'Sk-Modernist-Regular', 
+                            fill: '#ffff', 
+                            fontWeight: '400'}}
+                    axisLine={false} 
                     tickLine={false}
                     width={10}
                 />
@@ -158,11 +230,11 @@ const ParameterStacked = () => {
               iconType="circle"
               iconSize={8}
               wrapperStyle={{
-                  fontFamily: 'Poppins',
+                  fontFamily: 'Sk-Modernist-Regular',
                   textTransform: 'uppercase',
                   fontSize: '0.7rem',
                   fontWeight: '300',
-                  marginTop: '1.5rem', // Add inline margin to adjust spacing for the legends
+                  marginTop: '1.5rem', 
                  
               }}
             />
@@ -170,10 +242,10 @@ const ParameterStacked = () => {
             <Bar 
               dataKey="Outliers" 
               stackId="a" 
-              fill="#4E79B4"
+              fill="#8cacff"
               shape={(props) => {
                 const { y, height, index } = props;
-                const isTop = data[index]['Normal Data'] === 0; // True if there's no Normal Data
+                const isTop = data[index]['Normal Data'] === 0; 
                 return <CustomBarShape {...props} isTop={isTop} />;
               }}
             />
@@ -183,7 +255,7 @@ const ParameterStacked = () => {
               fill="#9FB9DD" 
               shape={(props) => {
                 const { y, height, index } = props;
-                const isTop = data[index]['Outliers'] === 0 || data[index]['Normal Data'] > 0; // True if there's Normal Data or if there's no Outliers
+                const isTop = data[index]['Outliers'] === 0 || data[index]['Normal Data'] > 0; 
                 return <CustomBarShape {...props} isTop={isTop} />;
               }}
             />

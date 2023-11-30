@@ -1,0 +1,11 @@
+.readingsResult{
+    margin-bottom: 2rem;
+    height: 15.2rem;
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}

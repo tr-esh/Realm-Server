@@ -1,5 +1,3 @@
-
-
 :root {
   --glass: rgb(96,228,222);
 }
@@ -15,7 +13,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Sk-Modernist-Regular";
 }
 
 .AppGlass {
@@ -26,7 +24,7 @@
   grid-template-columns: 24rem auto;
 }
 
-@media screen and (max-width: 768px ) {
+@media screen and (max-width: 1366px ) {
 
   .AppGlass {
     grid-template-columns: 18rem auto;

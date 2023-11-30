@@ -1,33 +1,16 @@
-.monthly-logs{
+.monthly-logs {
+    /* background-image: url('../../img/blue_waves_papercut_6888658.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-blend-mode: lighten; */
     margin: 0 auto;
     padding: 0;
     box-sizing: border-box;
-    width: 95%;
+    width: 100%;
 }
 
-
-.slick-prev,
-.slick-next {
-  opacity: 0;
-}
-
-.month-logs:hover .slick-prev,
-.month-logs:hover .slick-next {
-  opacity: 1;
-  border-radius: 50%; 
-}
-
-.custom-arrow {
-  transition: all 0.3s ease;
-}
-
-.custom-arrow:hover {
-    background-color: #66B2FF; 
-    cursor: pointer; 
-    border-radius: 50%; 
-  }
-
-  .disabled-month {
+.disabled-month {
     opacity: 0.5; 
     cursor: not-allowed;
+    background-blend-mode: luminosity;
 }

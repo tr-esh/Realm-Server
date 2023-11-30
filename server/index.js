@@ -3,11 +3,16 @@ const mongoose = require('mongoose')
 const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
-//const MongoClient = require('mongodb').MongoClient;
 const parameterRoutes = require('./routes/parameters')
 const os = require('os');
-const interfaces = os.networkInterfaces();
 const path = require('path');
+
+
+const interfaces = os.networkInterfaces();
+
+const parametersController = require('./controllers/dataPreparation');
+const nextValuesController = require('./controllers/dailyDataPreparation');
+
 let ip_address;
 
 for (let k in interfaces) {
@@ -34,10 +39,9 @@ app.use((req, res, next) => {
     next()
 })
 
-app.use(require("./routes/parameters"))
-
 
 //routes
+app.use(require("./routes/parameters"))
 app.use('/api/realm', parameterRoutes)
 
 
@@ -45,6 +49,15 @@ const rootDirectory = path.join(__dirname);
 console.log(rootDirectory);
 
 //server client
+app.use(express.static(path.join(__dirname, "../client/build")))
+app.get("*", (req, res) =>
+    res.sendFile(
+        path.resolve(__dirname, "../", "client", "build", "index.html")
+    )
+);
+
+
+//server-client connection
 app.use(express.static(path.join(__dirname, "../client/build")))
 app.get("*", (req, res) =>
     res.sendFile(
@@ -67,6 +80,11 @@ mongoose.connection.on("error", function(error) {
 mongoose.connection.on("open", function() {
     console.log("Successfully established connection.")
 })
+
+
+// Initiate the cron jobs
+parametersController.scheduleDataJobs();
+nextValuesController.scheduleDataJobs();
 
 
 //port

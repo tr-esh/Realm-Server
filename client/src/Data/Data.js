@@ -1,32 +1,42 @@
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import TimelineRoundedIcon from '@mui/icons-material/TimelineRounded';
 import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
-// import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
-
-
+import QueryStatsRoundedIcon from '@mui/icons-material/QueryStatsRounded';
 
 
 export const SidebarData = [
     {
-        icon: <DashboardRoundedIcon className='sidebar-icon'  sx={{ fontSize: 30, paddingTop:'0.5rem'}}/> ,
+        icon: <DashboardRoundedIcon 
+                className='sidebar-icon'  
+                sx={{ fontSize: 30, paddingTop:'0.5rem'}}
+              /> ,
         path: "/",
         heading: "Dashboard",
     },
     {
-        icon: <TimelineRoundedIcon className='sidebar-icon'sx={{ fontSize: 30, paddingTop:'0.5rem'}}/>,
+        icon: <TimelineRoundedIcon 
+                className='sidebar-icon'
+                sx={{ fontSize: 30, paddingTop:'0.5rem'}}
+              />,
         path: "/Analytics",
         heading: "Analytics",
     },
     {
-        icon: <FormatListBulletedRoundedIcon className='sidebar-icon' sx={{ fontSize: 30, paddingTop:'0.5rem'}}/> ,
+        icon: <FormatListBulletedRoundedIcon
+                className='sidebar-icon' 
+                sx={{ fontSize: 30, paddingTop:'0.5rem'}}
+               />,
         path: "/Logs",
         heading: "Log Entries",
     },
-    // {
-    //     icon: <SettingsRoundedIcon className='sidebar-icon' sx={{ fontSize: 30, paddingTop:'0.5rem'}}/> ,
-    //     path: "/Controls",
-    //     heading: "Control Panel",
-    // },
+    {
+        icon: <QueryStatsRoundedIcon 
+                className='sidebar-icon' 
+                sx={{ fontSize: 30, paddingTop:'0.5rem'}}
+              /> ,
+        path: "/Assess",
+        heading: "Assessment",
+    },
     
 ];
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 import Analytics from '../../../pages/Analytics'
-import ControlPanel from '../../../pages/ControlPanel'
+import Assessment from '../../../pages/Assessment'
 import Home from '../../../pages/Home'
 import RecordLogs from '../../../pages/RecordLogs'
 import RecordMonthHolder from '../../Records/RecordMonthHolder'
@@ -15,10 +15,11 @@ const Main = () => {
           <Route path="/" element={<Home />} />
           <Route path="/Analytics" element={<Analytics />} />
           <Route path="/Logs" element={<RecordLogs />} />
-          <Route path="/Controls" element={<ControlPanel />} />
+          <Route path="/Assess" element={<Assessment />} />
           <Route path="/Logs/RecordTable/:month" element={<RecordMonthHolder />} />
           <Route path="/table" element={<RecordMonthTable />} />
           <Route path="/Analytics/:parameter" element={<Analytics />} />
+          <Route path="/AssessMain/:parameter" element={<Assessment />} />
         </Routes>
     </div>
   )

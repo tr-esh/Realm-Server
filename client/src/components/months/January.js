@@ -10,7 +10,9 @@ const January = ({January}) => {
             const json = await response.json();
             if (response.ok) {
                 const january = moment().month(0); // Set month to January
-                const filteredData = json.filter((data) => moment(data.createdAt).isSame(january, 'month'));
+                const filteredData = json.filter((data) => 
+                    moment(data.createdAt).isSame(january, 'month'));
+                    
                 setAllParams(filteredData);
             }
         };

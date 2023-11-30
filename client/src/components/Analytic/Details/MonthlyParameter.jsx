@@ -15,12 +15,11 @@ const MonthlyParameter = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/realm/monthdata'); // Replace with your actual backend API endpoint
+        const response = await fetch('/api/realm/monthdata'); 
         const responseData = await response.json();
 
         setData(responseData);
 
-        // Determine the month with the most data
         const monthCounts = {};
         responseData.forEach((entry) => {
           const createdAt = new Date(entry.createdAt);
@@ -33,16 +32,18 @@ const MonthlyParameter = () => {
         );
         setMostDataMonth(mostDataMonth);
 
-        // Count the occurrences of temperature, ph, and turbidity in the selected month
         const selectedMonthData = responseData.filter((entry) => {
           const createdAt = new Date(entry.createdAt);
           const month = createdAt.toLocaleString('en-US', { month: 'long' });
           return month === mostDataMonth;
         });
 
-        const temperatureCount = selectedMonthData.filter((entry) => entry.type === 'temperature').length;
-        const phCount = selectedMonthData.filter((entry) => entry.type === 'pH').length;
-        const turbidityCount = selectedMonthData.filter((entry) => entry.type === 'turbidity').length;
+        const temperatureCount = selectedMonthData.filter((entry) => 
+                                    entry.type === 'temperature').length;
+        const phCount = selectedMonthData.filter((entry) => 
+                                    entry.type === 'pH').length;
+        const turbidityCount = selectedMonthData.filter((entry) => 
+                                    entry.type === 'turbidity').length;
 
         setTemperatureCount(temperatureCount);
         setPhCount(phCount);
@@ -62,72 +63,97 @@ const MonthlyParameter = () => {
   ];
 
   const totalValue = temperatureCount + phCount + turbidityCount;
-
   const tooltipFormatter = (value) => {
     const percentage = ((value / totalValue) * 100).toFixed(2);
     return `${percentage}%`;
   };
 
   const tooltipStyle = {
-    fontFamily: 'Poppins', // Replace with the desired font family
+    fontFamily: 'Sk-Modernist-Regular', 
     fontSize: '0.9rem',
     fontWeight: '500',
   };
   
   
   return (
-    <div className="chart-container" style={{ display: 'flex', justifyContent: 'center', height: '100%', width: '100%' }}>
-      <div className="chart-wrapper" style={{ width: '350px' }}>
-      <div style={{ fontFamily: 'Poppins', fontSize: '0.7rem', fontWeight: '500', textTransform: 'uppercase', textAlign: 'left' }}>
-       MONTH WITH MOST FINDINGS
+    <div className="chart-container"
+         style={{ display: 'flex', 
+                  justifyContent: 'center', 
+                  height: '100%', 
+                  width: '100%' }}>
+
+       <div className="chart-wrapper" 
+            style={{ width: '350px' }}>
+      <div style={{ fontFamily: 'Sk-Modernist-Regular', 
+                    fontSize: '0.7rem', 
+                    fontWeight: '500', 
+                    textTransform: 'uppercase', 
+                    textAlign: 'left' }}>
+                    MONTH WITH MOST FINDINGS
+      </div>
+    <div className='data-count' 
+         style={{ fontSize: '3rem', 
+                  fontWeight: '700', 
+                  fontFamily: 'Sk-Modernist-Regular', 
+                  textAlign: 'left', 
+                  marginTop: '-0.5rem', color: '#8cacff'}}>
+                 {temperatureCount + phCount + turbidityCount}
     </div>
-    <div className='data-count' style={{ fontSize: '2rem', fontWeight: '700', fontFamily: 'Poppins', textAlign: 'left', marginTop: '-0.5rem'}}>
-      {temperatureCount + phCount + turbidityCount}
+    
+    <div className='most-month'  
+         style={{ fontFamily: 'Sk-Modernist-Regular', 
+                  fontSize: '0.7rem', 
+                  fontWeight: '300', 
+                  textTransform: 'uppercase', 
+                  textAlign: 'left', 
+                  marginTop: '-0.5rem'}}> 
+                  {mostDataMonth}
     </div>
-    <div className='most-month'  style={{ fontFamily: 'Poppins', fontSize: '0.7rem', fontWeight: '300', textTransform: 'uppercase', textAlign: 'left', marginTop: '-0.5rem'}}> 
-    {mostDataMonth}
-    </div>
-        <ResponsiveContainer className="chart-responsive-container">
-          <PieChart >
-            <Pie
-              data={chartData}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              outerRadius={80}
-              innerRadius={60} // Added innerRadius to create a donut chart
-              fill="#8884d8"
-              dataKey="value"
-              stroke="none"
-            >
+        
+        <ResponsiveContainer 
+          className="chart-responsive-container">
+            <PieChart >
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={80}
+                innerRadius={60} 
+                fill="#8884d8"
+                dataKey="value"
+                stroke="none"
+              >
              
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell key={`cell-${index}`} 
+                      fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-           
-            <Tooltip formatter={tooltipFormatter} contentStyle={tooltipStyle} /> 
-            <Legend
-                    align="left"
-                    verticalAlign="middle"
-                    layout="vertical"
-                    iconType="circle"
-                    iconSize={8}
-                    wrapperStyle={{
-                        fontFamily: 'Poppins',
-                        textTransform: 'uppercase',
-                        fontSize: '0.7rem',
-                        fontWeight: '300',
-                        marginTop: '-25px' // Add inline margin to adjust spacing for the legends
-                    }}
-                />
+              <Tooltip 
+                      formatter={tooltipFormatter} 
+                      contentStyle={tooltipStyle} /> 
+              <Legend
+                      align="left"
+                      verticalAlign="middle"
+                      layout="vertical"
+                      iconType="circle"
+                      iconSize={8}
+                      wrapperStyle={{
+                          fontFamily: 'Sk-Modernist-Regular',
+                          textTransform: 'uppercase',
+                          fontSize: '0.7rem',
+                          fontWeight: '300',
+                          marginTop: '-25px' 
+                      }}
+                  />
           </PieChart>
         </ResponsiveContainer>
-       
       </div>
-      <div className="chart-wrapper" style={{ width: '400px' }}>
-        <ParameterStacked />
-      </div>
+        <div className="chart-wrapper" 
+            style={{ width: '400px' }}>
+            <ParameterStacked />
+        </div>
     </div>
   );
 };

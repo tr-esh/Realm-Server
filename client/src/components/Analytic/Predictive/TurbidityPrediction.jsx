@@ -12,57 +12,92 @@ import {
 
 const TurbidityPrediction = () => {
     const [predictions, setPredictions] = useState([]);
+    const [error, setError] = useState(null); 
+
+    // useEffect(() => {
+    //   // Fetch data immediately on mount
+    //   fetchData();
+
+    //   // Then fetch data every minute
+    //   const intervalId = setInterval(fetchData, 60 * 1000);
+
+    //   // Clear interval on unmount
+    //   return () => clearInterval(intervalId);
+    // }, []);
 
     useEffect(() => {
-      // Fetch data immediately on mount
-      fetchData();
+        async function fetchData() {
+            try {
+                const response = await fetch('/api/realm/predictions/turbidity');
+                const jsonData = await response.json();
+    
+                if (jsonData.length > 0) {
+                    const now = new Date();
+                    const currentHour = now.getHours();
+    
+                    const desiredHours = Array.from({ length: 12 }, (_, i) => (currentHour + (i * 2)) % 24);
 
-      // Then fetch data every minute
-      const intervalId = setInterval(fetchData, 60 * 1000);
-
-      // Clear interval on unmount
-      return () => clearInterval(intervalId);
+                    const formattedData = desiredHours.map(desiredHour => {
+                        const matchedData = jsonData.find(item => {
+                            const itemDate = new Date(item.values.timestamp);
+                            return itemDate.getHours() === desiredHour;
+                        });
+    
+                        if (matchedData) {
+                            return {
+                                value: matchedData.values.value,
+                                timestamp: new Date(`${now.toISOString()
+                                                          .slice(0, 11)}${String(desiredHour)
+                                                          .padStart(2, '0')}:00:00Z`)
+                            };
+                        } else {
+                            return {
+                                value: null,
+                                timestamp: new Date(`${now.toISOString()
+                                                          .slice(0, 11)}${String(desiredHour)
+                                                          .padStart(2, '0')}:00:00Z`)
+                            };
+                        }
+                    });
+    
+                    setPredictions(formattedData);
+                } else {
+                    setError('Prediction data is not available.');
+                }
+            } catch (error) {
+                console.error(error);
+                setError('An error occurred while fetching data.');
+            }
+        }
+    
+        fetchData();
     }, []);
-
-    const fetchData = async () => {
-      try {
-          const predictionsRes = await fetch(`/api/realm/predictions/turbidity`);
-          const predictionsJson = await predictionsRes.json();
-          
-          if (predictionsRes.ok) {
-              setPredictions(predictionsJson);
-          } else {
-              console.error('Server responded with:', predictionsJson);
-          }
-      } catch (error) {
-          console.error('Error fetching data:', error);
-      }
-  };
+    
 
     const processPredictedData = useCallback(() => {
-    if (!predictions || Object.keys(predictions).length === 0) return [];
+        return predictions.map((entry) => {
+            const date = new Date(entry.timestamp);
+    
+            if (isNaN(date.getTime())) {
+                console.warn('Invalid date:', entry.timestamp);
+                return null;
+            }
+    
+            const hour = date.getUTCHours();
+            const period = hour < 12 ? 'AM' : 'PM';  
+            const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+    
+            return {
+                hour: `${displayHour} ${period}`,
+                predictedTurbidity: entry.value ? parseFloat(entry.value.toFixed(2)) : null
+            };
+        }).filter(Boolean);
+    }, [predictions]);
 
-    const startingHour = new Date().getHours();
+        const processedData = useMemo(() => {
+            return processPredictedData();
+        }, [processPredictedData]);
 
-    return predictions.values.map((value, index) => {
-        const totalHours = startingHour + index * 2;
-        const calculatedHour = totalHours % 12;
-        const displayHour = calculatedHour === 0 ? 12 : calculatedHour;
-        const period = totalHours >= 24 || totalHours < 12 ? 'AM' : 'PM';  // This line handles the AM/PM switch correctly
-        
-        return {
-            hour: `${displayHour} ${period}`,
-            predictedTurbidity: parseFloat(value.toFixed(2))
-        };
-    });
-}, [predictions]);
-  
-
-    const processedData = useMemo(() => {
-        return processPredictedData();
-    }, [processPredictedData]);
-
-    console.log(processedData);
 
     const CustomXAxisTick = ({ x, y, payload }) => {
         const hour = payload.value;
@@ -84,7 +119,7 @@ const TurbidityPrediction = () => {
                             fontSize: '0.7rem',
                             border: 'none',
                             textTransform: 'uppercase',
-                            fontFamily: 'Poppins'
+                            fontFamily: 'Sk-Modernist-Regular'
                         }}
                         onClick={handleButtonClick}
                     >
@@ -98,7 +133,10 @@ const TurbidityPrediction = () => {
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="custom-tooltip" style={{ backgroundColor: '#0d2135', width: '15rem', border: 'none'}}>
+                <div className="custom-tooltip" 
+                     style={{ backgroundColor: '#0d2135', 
+                              width: '15rem', 
+                              border: 'none'}}>
                     <p className="label" >{`Predicted Reading: ${payload[0].value}`}</p>
                 </div>
             );
@@ -107,7 +145,11 @@ const TurbidityPrediction = () => {
     }; 
 
     return (
-        <div style={{ width: '100%', height: '70%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ width: '100%', 
+                      height: '70%', 
+                      display: 'flex', 
+                      justifyContent: 'center', 
+                      alignItems: 'center' }}>
             <ResponsiveContainer>
                 <AreaChart data={processedData}>
                     <XAxis
@@ -128,13 +170,14 @@ const TurbidityPrediction = () => {
                         type="monotone"
                         dataKey="predictedTurbidity"
                         name="Predicted Reading"
-                        stroke="#F1918F"
-                        fill="#F1918F"
+                        stroke="#8cacff"
+                        fill="#8cacff"
                         fillOpacity={0.3}
-                        dot={{ r: 3 }}
+                        strokeWidth={4}
                         >
-                        <LabelList dataKey="predictedTurbidity" position="top"
-                                    style={{ fontFamily: 'Poppins', fontSize: '0.7rem'}} />
+                        <LabelList dataKey="predictedTurbidity" 
+                                   position="top"
+                                   style={{ fontFamily: 'Sk-Modernist-Regular', fontSize: '0.7rem'}} />
                     </Area>
                 </AreaChart>
             </ResponsiveContainer>

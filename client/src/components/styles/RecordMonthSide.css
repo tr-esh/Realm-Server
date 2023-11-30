@@ -5,11 +5,12 @@
 
 .statement {
     padding-left: 0.5rem;
-    font-size: 1.5rem;
+    font-size: 2rem;
     font-weight: 600;
     line-height: 1;
     color: white;
 }
+
 .param-container{
     background-color: #0D2135;
     border: none;
@@ -19,8 +20,9 @@
     display: flex;
     align-items: center;
     margin-top: 0.5rem;
-    font-family: 'Poppins';
+    font-family: 'Sk-Modernist-Regular';
 }
+
 .param-container:hover{
     background-color: #17334e;
     box-shadow: inset 0 0 0 1px #5090D3;
@@ -36,30 +38,55 @@
   color: #ffff;
 }
 
-.param-container:hover .select{
+.param-container:hover .select {
     color: #6cb8ff;
     font-size: 2rem;
 }
-.icons-holder{
+
+.icons-holder {
     border-radius: 2rem;
     height: 3.4rem ; 
     width: 3.5rem; 
     margin-left: 0.5rem;
 }
-.param-container:hover .icons-holder{
-    width: 8rem;
-}
-.param-container.active .icons-holder{
+
+.param-container:hover .icons-holder {
     width: 8rem;
 }
 
-.param-name{
+.param-container.active .icons-holder {
+    width: 8rem;
+}
+
+.param-name {
     font-size: 1rem;
 }
-.results{
+
+.results {
     height: 3.5rem ; 
     width: 8rem; 
     padding-top: 1rem;
+}
 
-   
+.export-contain {
+    margin-top: 6rem;
+    display: flex;
+    flex-direction: row;
+    background-color: #0D2135;
+    border-radius: 3rem;
+    height: 5rem;
+    width: 17rem;
+}
+
+.export-btn{
+    margin: 1rem 0.9rem;
+}
+
+.export-main-btn {
+    font-size: 'Sk-Modernist-Regular';
+    font-size: 1rem;
+    text-transform: uppercase;
+    text-align: left;
+    cursor: pointer;
+    margin: 1.7rem 0.9rem;
 }

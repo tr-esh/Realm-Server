@@ -8,7 +8,11 @@ const Summary = () => {
       
     return (
         <div >
-            <div style={{fontFamily: 'Poppins', fontSize: '1.2rem'}}> MONTHLY <span style={{color: '#66B2FF'}} > DISTRIBUTION </span> </div> 
+            <div 
+               style={{fontFamily: 'Sk-Modernist-Regular', 
+                       fontSize: '1.5rem'}}> 
+                       MONTHLY 
+                       <span style={{color: '#8cacff'}} > DISTRIBUTION </span> </div> 
             <div style={{ height: '15rem'}}> 
             <SummaryChart />
             </div>

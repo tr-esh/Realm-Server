@@ -26,9 +26,15 @@ const DashClock = () => {
   return (
     <div className="clock">
       <div className="clock-face">
-        <div className="hand hour-hand" style={{ transform: `rotate(${hourHandDegrees}deg)` }} />
-        <div className="hand minute-hand" style={{ transform: `rotate(${minuteHandDegrees}deg)` }} />
-        <div className="hand second-hand" style={{ transform: `rotate(${secondHandDegrees}deg)` }} />
+        <div className="hand hour-hand" 
+             style={{ transform: `rotate(${hourHandDegrees}deg)` }} 
+          />
+        <div className="hand minute-hand" 
+             style={{ transform: `rotate(${minuteHandDegrees}deg)` }} 
+          />
+        <div className="hand second-hand" 
+             style={{ transform: `rotate(${secondHandDegrees}deg)` }} 
+          />
       </div>
     </div>
   )

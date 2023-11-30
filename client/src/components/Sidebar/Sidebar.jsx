@@ -3,9 +3,7 @@ import '../styles/Sidebar.css'
 import { NavLink, useLocation } from "react-router-dom"
 import { SidebarData } from '../../Data/Data'
 import AccuracyRate from './AccuracyRate'
-import AutoGraphRoundedIcon from '@mui/icons-material/AutoGraphRounded';
-const realm_lg = new URL('../Sidebar/realm_text_logo.png', import.meta.url)
-
+const realm_lg = new URL('../Sidebar/realm_text.png', import.meta.url)
 
 const Sidebar = () => {
   
@@ -39,15 +37,24 @@ const Sidebar = () => {
     }, []);
 
     useEffect(() => {
-      // Get the base of the current path
-      const baseLocation = location.pathname.split('/')[1];
-
-      // Find the matching item in SidebarData
-      const currentIndex = SidebarData.findIndex(item => item.path.includes(`/${baseLocation}`));
-      if (currentIndex !== -1) {
-          setSelected(currentIndex);
+      // Split the pathname to get the base and possible parameters
+      const [baseLocation, param] = location.pathname.split('/').slice(1);
+  
+      let matchIndex = -1;
+      if (baseLocation === "AssessMain" && param) {
+          matchIndex = SidebarData.findIndex(item => 
+              item.path === "/Assess"
+          );
+      } else {
+          matchIndex = SidebarData.findIndex(item => 
+              item.path.split('/')[1] === baseLocation
+          );
       }
-    }, [location]);
+  
+      if (matchIndex !== -1) {
+          setSelected(matchIndex);
+      }
+  }, [location]);
   
     useEffect(() => {
       localStorage.setItem('selected', selected);
@@ -57,8 +64,12 @@ const Sidebar = () => {
 
   return (
     <div className="Sidebar">
+
         <div className="logo">
-            <img src={realm_lg} alt="realm" className="realm_logo"/>
+            <img src={realm_lg} 
+                 alt="realm" 
+                 className="realm_logo"
+              />
         </div>
 
         <div className="menu">
@@ -72,7 +83,12 @@ const Sidebar = () => {
                     to={item.path}
                     style={{ color:'white', textDecoration: 'none' }}
                     className={({ isactive }) => (isactive ? activeLink : normalLink)}
-                    isActive={() => location.pathname.startsWith(item.path)}
+                    isActive={() => {
+                        if (location.pathname.startsWith("/AssessMain")) {
+                            return item.path === "/Assess";
+                        }
+                        return location.pathname.startsWith(item.path);
+                    }}
                 >
                     <div className="item-holder" style={{display: 'flex', alignItems: 'center'}}>
                         <span className="icon">
@@ -85,16 +101,18 @@ const Sidebar = () => {
                 </NavLink>
             </div>
           ))}
-            
+          
           <div className="Sign">
             <div className="holder">
-
-              <div className="responses" style={{display:'flex'}}>
+              <div className="responses" 
+                   style={{display:'flex'}}
+                >
                 <div className="head-title">
-                  <AutoGraphRoundedIcon style={{fontSize: '2rem', color: '#66B2FF'}}/>
                   <div className="res-name">
-                    <p className='accuracy'> ACCURACY RESULT </p> 
-                    <span className='accuracy-time'> as of {yesterdayDate}</span>
+                    <p className='accuracy'> ACCURACY
+                    </p> 
+                    <p className='accuracy-time'> as of {yesterdayDate}
+                      </p>
                   </div>
                 </div>
                 <div className="progress-bar">

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend, Text} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Text} from 'recharts';
 
 const fetchData = async () => {
-    const response = await fetch('/api/realm/alldata'); // Update with your API endpoint
+    const response = await fetch('/api/realm/alldata'); 
     const data = await response.json();
     return data;
 }
@@ -35,16 +35,27 @@ const SummaryChart = () => {
 
     const CustomizedAxisTick = ({ x, y, payload }) => {
         return (
-          <Text x={x} y={y} textAnchor="middle" verticalAnchor="start" fontFamily="Poppins" fontWeight= '400' fill = '#ffff' fontSize = '0.7rem'>
-            {payload.value.toUpperCase()}
+          <Text x={x} y={y} textAnchor="middle" 
+                            verticalAnchor="start" 
+                            fontFamily="Sk-Modernist-Regular" 
+                            fontWeight= '400' 
+                            fill = '#ffff' 
+                            fontSize = '0.7rem'>
+                            {payload.value.toUpperCase()}
           </Text>
         );
       };
       
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div 
+            style={{ width: '100%', 
+                    height: '100%', 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center' }}> 
+        
             
-            <ResponsiveContainer>
+          <ResponsiveContainer>
             <BarChart
                 width={500}
                 height={300}
@@ -56,39 +67,32 @@ const SummaryChart = () => {
                     bottom: 5
                 }}
             >
+        
+                <XAxis 
+                    dataKey="month" 
+                    tick={<CustomizedAxisTick />} 
+                    tickLine={false}/>
                 
-                <Legend
-                    align="center"
-                    verticalAlign="bottom"
-                    layout="horizontal"
-                    iconType="circle"
-                    iconSize={8}
-                    wrapperStyle={{
-                        fontFamily: 'Poppins',
-                        textTransform: 'uppercase',
-                        fontSize: '0.7rem',
-                        fontWeight: '300',
-                        marginTop: '-10px' // Add inline margin to adjust spacing for the legends
-                    }}
-                />
-                <XAxis dataKey="month" tick={<CustomizedAxisTick />} tickLine={false}/>
                 <YAxis 
-                    tick={{ fontSize: 10, fontFamily: 'Poppins', fill: '#ffff', fontWeight: '400' }} // Change font color here
-                    axisLine={false} // Remove the level line
+                    tick={{ fontSize: 10, 
+                            fontFamily: 'Sk-Modernist-Regular', 
+                            fill: '#ffff', 
+                            fontWeight: '300' }} 
+                    axisLine={false} 
                     tickLine={false}
                     width={10}
                 />
-                
+                <CartesianGrid stroke="#142338" strokeDasharray="3 3"/>
                 <Tooltip
                     cursor={{ fill: 'transparent' }}
-                    contentStyle={{ backgroundColor: 'rgba(13, 33, 53, 0.32)', // Set the menu background color
+                    contentStyle={{ backgroundColor: 'rgba(13, 33, 53, 0.32)', 
                     boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
                     backdropFilter: 'blur(15px)',
                     WebkitBackdropFilter: 'blur(15px)',
                     color: 'white',
                     fontSize: '1rem',
-                    fontFamily: 'Poppins',
-                    borderRadius: '0.5rem', border: 'none'}} // Customize tooltip color
+                    fontFamily: 'Sk-Modernist-Regular',
+                    borderRadius: '0.5rem', border: 'none'}} 
                 />
                 <Bar
                     dataKey="TEMPERATURE"
@@ -109,9 +113,7 @@ const SummaryChart = () => {
                 />
 
             </BarChart>
-           
         </ResponsiveContainer>
-       
         </div>
     );
 }

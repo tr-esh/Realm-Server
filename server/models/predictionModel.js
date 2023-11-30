@@ -4,8 +4,10 @@ const Schema = mongoose.Schema
 
 const predictionSchema = new Schema({
     metricType: String,
-    timestamp: Date,
-    values: [Number]
+    values: [{
+        timestamp: Date,
+        value: Number
+    }]
 });
 
 module.exports = mongoose.model('Predictions', predictionSchema);

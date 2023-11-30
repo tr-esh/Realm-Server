@@ -60,45 +60,80 @@ const RecordMonthTable = () => {
 
   return (
 
-    
-
     <div className='Month-Table'>
         <Item style={{ borderRadius: '2rem' }}>
-            <TableContainer  sx={{
-              "& th": {
-                color: "rgba(96, 96, 96)",
-                backgroundColor: "rgba(49, 87, 123, 1)",
-                position: 'sticky', 
-                top: 0,
-              },
-              "&::-webkit-scrollbar": {
-              width: 20
-              },
-              "&::-webkit-scrollbar-track": {
-              backgroundColor: "#194069",
-              borderRadius: 2
-              },
-              "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "#0F263F",
-              borderRadius: 2
-              }
-            }}style={{ maxHeight: '400px', overflowY: 'scroll'  }}>
+            <TableContainer   sx={{
+                "& th": {
+                  color: "rgba(96, 96, 96)",
+                  backgroundColor: "rgba(49, 87, 123, 1)",
+                  position: 'sticky', 
+                  top: 0,
+                },
+                "&::-webkit-scrollbar": {
+                  display: 'none'  // This hides the scrollbar
+                }
+              }}style={{ maxHeight: '400px', overflowY: 'auto'  }}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell style={{ color: 'white', fontFamily: 'Poppins, sans-serif', fontSize: '1rem', textAlign: 'center' }}>Parameter Name</TableCell>
-                  <TableCell style={{ color: 'white', fontFamily: 'Poppins, sans-serif', fontSize: '1rem', textAlign: 'center' }}>Value</TableCell>
-                  <TableCell style={{ color: 'white', fontFamily: 'Poppins, sans-serif', fontSize: '1rem', textAlign: 'center' }}>Status</TableCell>
-                  <TableCell style={{ color: 'white', fontFamily: 'Poppins, sans-serif', fontSize: '1rem', textAlign: 'center' }}>Time & Date</TableCell>
+                  <TableCell style={{ color: 'white', 
+                                      fontFamily: 'Poppins, sans-serif', 
+                                      fontSize: '1rem', 
+                                      textAlign: 'center' 
+                                    }}
+                    >
+                      Parameter Name
+                  </TableCell>
+                  <TableCell style={{ color: 'white', 
+                                      fontFamily: 'Poppins, sans-serif', 
+                                      fontSize: '1rem', 
+                                      textAlign: 'center' }}
+                    >
+                      Value
+                  </TableCell>
+                  <TableCell style={{ color: 'white',
+                                      fontFamily: 'Poppins, sans-serif', 
+                                      fontSize: '1rem', 
+                                      textAlign: 'center' }}
+                    >
+                      Status
+                  </TableCell>
+                  <TableCell style={{ color: 'white', 
+                                      fontFamily: 'Poppins, sans-serif', 
+                                      fontSize: '1rem', 
+                                      textAlign: 'center' }}
+                    >
+                      Time & Date
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody style={{ maxHeight: 20 }}>
                 {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                   <TableRow key={row.id}>
-                    <TableCell style={{ color: 'white', textAlign: 'center', fontFamily: 'Poppins' }}>{row.type}</TableCell>
-                    <TableCell style={{ color: 'white', textAlign: 'center', fontFamily: 'Poppins' }}>{row.value}</TableCell>
-                    <TableCell style={{ color: 'white', textAlign: 'center', fontFamily: 'Poppins' }}>{row.status}</TableCell>
-                    <TableCell style={{ color: 'white', textAlign: 'center', fontFamily: 'Poppins' }}>{moment(row.createdAt).format('LT[ • ]LL')}</TableCell>
+                    <TableCell style={{ color: 'white', 
+                                        textAlign: 'center', 
+                                        fontFamily: 'Poppins' }}
+                      >
+                        {row.type}
+                    </TableCell>
+                    <TableCell style={{ color: 'white', 
+                                        textAlign: 'center', 
+                                        fontFamily: 'Poppins' }}
+                      >
+                        {row.value}
+                    </TableCell>
+                    <TableCell style={{ color: 'white', 
+                                        textAlign: 'center', 
+                                        fontFamily: 'Poppins' }}
+                      >
+                        {row.status}
+                    </TableCell>
+                    <TableCell style={{ color: 'white', 
+                                        textAlign: 'center', 
+                                        fontFamily: 'Poppins' }}
+                      >
+                        {moment(row.createdAt).format('LT[ • ]LL')}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

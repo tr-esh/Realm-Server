@@ -3,7 +3,6 @@ import '../components/styles/RecordLog.css'
 import RecordMain from '../components/Records/RecordMain';
 import RecordSide from '../components/Records/RecordSide';
 
-
 const RecordLogs = () => {
 
   return (

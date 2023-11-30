@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { styled } from '@mui/material/styles';
+import { styled } from '@mui/system';
 import '../styles/Dashboard.css';
 import { Divider } from '@mui/material';
 import '../styles/DashboardSide.css';
@@ -10,6 +10,7 @@ import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 import moment from 'moment';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import CampaignRoundedIcon from '@mui/icons-material/CampaignRounded';
+import DataFetcher from './DataFetcher';
 
 const DashboardSide = () => {
   const useStyles = styled(() => ({
@@ -45,8 +46,9 @@ const DashboardSide = () => {
   const [turbiditynotif, setTurbidityNotif] = useState([]);
   const [phnotif, setPhNotif] = useState([]);
   const [modalData, setModalData] = useState([]);
-  const [maxWidth, setMaxWidth] = useState('xl'); // State for modal maxWidth
-  const [notificationHistory, setNotificationHistory] = useState([]); // State for notification history
+  const [maxWidth, setMaxWidth] = useState('xl');
+  const [notificationHistory, setNotificationHistory] = useState([]);
+  const [selectedAlertType, setSelectedAlertType] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,18 +59,10 @@ const DashboardSide = () => {
       if (response.ok) {
         // Filter data to only include the current day
         const today = moment().startOf('day');
-        const filteredData = json.filter((data) =>
-          moment(data.createdAt).isSame(today, 'day')
-        );
-        const tempData = filteredData.filter(
-          (param) => param.parameter_name === 'temperature'
-        );
-        const ntuData = filteredData.filter(
-          (param) => param.parameter_name === 'turbidity'
-        );
-        const pHData = filteredData.filter(
-          (param) => param.parameter_name === 'pH'
-        );
+        const filteredData = json.filter((data) => moment(data.createdAt).isSame(today, 'day'));
+        const tempData = filteredData.filter((param) => param.parameter_name === 'temperature');
+        const ntuData = filteredData.filter((param) => param.parameter_name === 'turbidity');
+        const pHData = filteredData.filter((param) => param.parameter_name === 'pH');
 
         setAll(filteredData);
         setNotificationCount(filteredData.length);
@@ -86,11 +80,9 @@ const DashboardSide = () => {
       const historyData = [];
       for (let i = 1; i <= 3; i++) {
         const pastDate = moment().subtract(i, 'days').startOf('day');
-        const response = await fetch(
-          `/api/realm/getall?date=${pastDate.format('YYYY-MM-DD')}`
-        );
+        const response = await fetch(`/api/realm/getall?date=${pastDate.format('YYYY-MM-DD')}`);
         const json = await response.json();
-  
+
         if (response.ok) {
           const notificationsCount = json.length;
           historyData.push({
@@ -101,12 +93,12 @@ const DashboardSide = () => {
       }
       setNotificationHistory(historyData);
     };
-  
+
     fetchNotificationHistory();
   }, []);
 
   const handleModalOpen = (alertType) => {
-    // filter the `all` array based on the clicked alert type
+    // Filter the `all` array based on the clicked alert type
     let filteredData = [];
     if (alertType === 'temperature') {
       filteredData = all.filter((data) => data.parameter_name === 'temperature');
@@ -116,12 +108,14 @@ const DashboardSide = () => {
       filteredData = all.filter((data) => data.parameter_name === 'pH');
     }
 
-    // update the state to open the modal and set the filtered data
+    // Update the state to open the modal and set the filtered data
+    setSelectedAlertType(alertType);
     setModalOpen(true);
     setModalData(filteredData);
   };
 
   const handleModalClose = () => {
+    setSelectedAlertType(null);
     setModalOpen(false);
   };
 
@@ -130,18 +124,17 @@ const DashboardSide = () => {
       (total, historyData) => total + historyData.notificationsCount,
       0
     );
-  
+
     const formattedTotal = totalNotificationsFromHistory.toLocaleString();
-  
+
     if (totalNotificationsFromHistory > 0) {
       return `has detected ${formattedTotal} ${
         totalNotificationsFromHistory === 1 ? 'anomaly' : 'anomalies'
-      } in the past 3 days`; // Change to "3 days" if that's your desired time frame.
+      } in the past 3 days`;
     } else {
-      return 'No new notifications from the past 3 days'; // Change to "3 days" if that's your desired time frame.
+      return 'No new notifications from the past 3 days';
     }
   };
-  
 
   const hasNotifications =
     temperaturenotif.length > 0 ||
@@ -149,9 +142,7 @@ const DashboardSide = () => {
     phnotif.length > 0 ||
     notificationHistory.length > 0;
 
-     
-  const warnIllustration = new URL('../../img/Warning-pana.png', import.meta.url)
-  
+  const warnIllustration = new URL('../../img/Warning-pana.png', import.meta.url);
 
   return (
     <div className="Dashboard-Side">
@@ -164,6 +155,8 @@ const DashboardSide = () => {
             marginTop: '0.5rem',
             lineHeight: 1.3,
             padding: '1.2rem',
+            color: '#7da4cc',
+            fontFamily: 'Sk-Modernist-Regular',
           }}
         >
           Keep a watchful eye on water quality with REALM, the innovative IoT
@@ -175,11 +168,11 @@ const DashboardSide = () => {
             style={{
               fontSize: '1rem',
               fontWeight: '600',
-              fontFamily: 'Inter',
+              fontFamily: 'Sk-Modernist-Regular',
               color: '#ffff',
             }}
           >
-            Records{' '}
+            RECORDS{' '}
           </span>
 
           <IconButton sx={{ marginTop: '-15px' }}>
@@ -220,8 +213,8 @@ const DashboardSide = () => {
               >
                 <WarningRoundedIcon
                   className="warning-icon"
-                  style={{ color: '#ffc661' }}
-                  sx={{ fontSize: '2rem' }}
+                  style={{ color: '#a74633' }}
+                  sx={{ fontSize: '2.5rem' }}
                 />
                 <span className="warning-holder">
                   <span className="warning-signal" style={{ color: '#ffff' }}>
@@ -243,8 +236,8 @@ const DashboardSide = () => {
               >
                 <WarningRoundedIcon
                   className="warning-icon"
-                  style={{ color: '#ffc661' }}
-                  sx={{ fontSize: '2rem' }}
+                  style={{ color: '#a74633' }}
+                  sx={{ fontSize: '2.5rem' }}
                 />
                 <span className="warning-holder">
                   <span className="warning-signal" style={{ color: '#ffff' }}>
@@ -260,14 +253,11 @@ const DashboardSide = () => {
               </p>
             )}
             {phnotif.length > 0 && (
-              <p
-                className="bulletin-holder"
-                onClick={() => handleModalOpen('ph')}
-              >
+              <p className="bulletin-holder" onClick={() => handleModalOpen('ph')}>
                 <WarningRoundedIcon
                   className="warning-icon"
-                  style={{ color: '#ffc661' }}
-                  sx={{ fontSize: '2rem' }}
+                  style={{ color: '#a74633' }}
+                  sx={{ fontSize: '2.5rem' }}
                 />
                 <span className="warning-holder">
                   <span className="warning-signal" style={{ color: '#ffff' }}>
@@ -282,28 +272,33 @@ const DashboardSide = () => {
                 </span>
               </p>
             )}
-           <div>  
-            <Divider
-          orientation="horizontal"
-          style={{ backgroundColor: '#515A5A', width: '18.5rem',  marginLeft: '2rem', marginTop: '2rem' }}
-          />
-            <div className="notification-history">
-            <CampaignRoundedIcon
+            <div>
+              <Divider
+                orientation="horizontal"
+                style={{
+                  backgroundColor: '#515A5A',
+                  width: '18.5rem',
+                  marginLeft: '2rem',
+                  marginTop: '2rem',
+                }}
+              />
+              <div className="notification-history">
+                <CampaignRoundedIcon
                   className="warning-icon"
                   style={{ color: '#ffc661' }}
                   sx={{ fontSize: '2rem' }}
                 />
-           
-            <span className="subwarning"> 
-            <span className='realm-not'> REALM {getNotificationHistoryMessage()} </span>
-            </span>
-            </div>
+
+                <span className="subwarning">
+                  <span className="realm-not"> REALM {getNotificationHistoryMessage()} </span>
+                </span>
+              </div>
             </div>
           </>
         ) : (
           <span
             style={{
-              fontFamily: 'Poppins',
+              fontFamily: 'Sk-Modernist-Regular',
               color: '#23496e',
               paddingLeft: '5rem',
             }}
@@ -311,9 +306,10 @@ const DashboardSide = () => {
             No new notifications
           </span>
         )}
+        <DataFetcher />
       </div>
- 
-      <Modal open={modalOpen} onClose={handleModalClose} maxWidth={maxWidth}>
+
+      <Modal open={selectedAlertType !== null} onClose={handleModalClose} maxWidth={maxWidth}>
         <div>
           <DialogTitle className="alert-title" style={{ fontFamily: 'Poppins' }}>
             <div style={{ lineHeight: '0.5', paddingTop: '0.7rem' }}>

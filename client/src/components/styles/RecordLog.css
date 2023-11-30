@@ -15,11 +15,12 @@
     display: flex;
     flex-direction: column;
     text-align: left;
-    padding: 0.5rem 1rem;
+    margin-top: -0.8rem;
+    margin-left: 2rem;
 }
 
 .headname > * {
-    font-size: 4rem;
+    font-size: 3rem;
     font-weight: 700;
 }
 
@@ -39,22 +40,19 @@
     width: 35vh;
     height: 5vh;
     border-radius: 0.75rem;
-    line-height: 3;
-    
-    
+    line-height: 3;   
 }
 
 .calendar_icn {
     padding-left: 1rem;
-
 }
 
-.separator{
+.separator {
     margin-top: 2.3rem;
     width: 0.1vw;
     height: 7vh;
     background: #7da4cc;
-  }
+}
 
 .buttons {
     display: flex;

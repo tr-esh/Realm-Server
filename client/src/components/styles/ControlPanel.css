@@ -5,3 +5,31 @@
     font-family: 'Poppins', sans-serif;
     grid-template-columns: 73rem auto;
 }
+
+.readingsRev {
+    margin: 1rem 1rem;
+    color: #ffff;
+}
+
+.readings-header {
+    text-align: start;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.readings-sub {
+    text-align: start;
+    font-size: 0.8rem;
+    font-weight: 400;
+    margin-top: -0.3rem;
+}
+
+.accuracyPerf {
+    margin: 1rem 1rem;
+    color: #ffff;
+}
+
+.chart-toggle-buttons {
+    display: flex;
+    justify-content: space-between; 
+}

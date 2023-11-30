@@ -6,7 +6,7 @@ const predictNextSchema = new Schema({
   metricType: String,
   values: [
     {
-      timestamp: Date,  // Include timestamp property
+      timestamp: Date,
       value: Number
     }
   ]

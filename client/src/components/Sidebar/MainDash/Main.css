@@ -4,11 +4,9 @@
     justify-content: space-evenly;
 }
 
-
-@media screen and (max-width: 1200px ){
+@media screen and (max-width: 1366px ) {
     .Main {
         justify-content: flex-start;
-        margin-top: 4rem;
     }
     
 }

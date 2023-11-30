@@ -1,4 +1,98 @@
-.controls-side{
+.controls-side {
     background-color: #0f263f;
-    padding: 3rem 2rem;
+    padding: 3rem 1.7rem;
+}
+
+.assess-holder {
+    padding: 1.5rem;
+}
+
+.a-header {
+    text-align: start;
+    display: flex;
+    flex-direction: column;
+    font-size: 2rem;
+    line-height: 1;
+    font-weight: 600;
+    color: beige;
+    margin-top: 1rem;
+    font-family: "Sk-Modernist-Regular";
+}
+
+.a-header1 {
+    color: #8cacff;
+    font-family: "Sk-Modernist-Regular";
+}
+
+.a-paragraph {
+    color: azure;
+    padding-top: 1rem;
+    font-weight: 400;
+    text-align: left;
+    font-size: 0.9rem;
+    color: #8cacff;
+    margin-top: 0.2rem;
+    margin-bottom: 2rem;
+    line-height: 1.3;
+    font-family: "Sk-Modernist-Regular";
+}
+.box-holder{
+    background-color: #8cacff;
+    width: 20rem;
+    height: 16rem;
+    border-radius: 1.5rem;
+    margin-top: 2rem;
+}
+.Ai-header{
+    font-family: "Sk-Modernist-Regular";
+    font-size: 2.2rem;
+    text-align: center;
+    padding-top: 2rem;
+    letter-spacing: 0.1rem;
+}
+.status-contain{
+    display: flex;
+    flex-direction: row;
+    
+}
+.arrow-box{
+    background-color: #09111c;
+    width: 5rem;
+    height: 5rem;
+    margin: 0 2rem;
+    border-radius: 1.8rem;
+}
+.rating{
+    margin: 0.5rem -1.5rem;
+}
+.acc-stat{
+    font-size: 0.8rem;
+    text-align: center;
+    margin-top: -0.3rem;
+    font-family: "Sk-Modernist-Regular";
+    letter-spacing: 0.1rem;
+    font-weight: 300;
+}
+.a-percentage{
+    display: flex;
+    flex-direction: column;
+    color: #09111c;
+}
+.a-rate{
+    font-size: 3.1rem;
+    font-weight: 700;
+}
+.arrow-head{
+    width: 4rem;
+    margin: 0.5rem 0.5rem;
+}
+.a-statement{
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-align: center;
+}
+.stat-holder{
+    width: 15rem;
+    margin: auto;
+    padding-top: 0.8rem;
 }

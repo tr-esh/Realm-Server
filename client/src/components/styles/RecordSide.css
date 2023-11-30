@@ -5,11 +5,10 @@
 
 .slogan-side{
     padding-left: 1.2rem;
-    font-size: 1.5rem;
+    font-size: 2.5rem;
     font-weight: 600;
     line-height: 1;
     color: white;
-
 }
 
 .Card-top {
@@ -22,18 +21,18 @@
     text-align: start;
     display: flex;
     flex-direction: column;
-    font-size: 1.5rem;
+    font-size: 2rem;
     line-height: 1;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Sk-Modernist-Regular';
     font-weight: 600;
 }
 
 .content-text {
     padding: 1.5rem 0;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Sk-Modernist-Regular';
     font-weight: 400;
     text-align: left;
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
 .Card-bottom {
@@ -46,18 +45,18 @@
     text-align: start;
     display: flex;
     flex-direction: column;
-    font-size: 1.5rem;
+    font-size: 2rem;
     line-height: 1;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Sk-Modernist-Regular';
     font-weight: 600;
 }
 
 .content2-text {
     padding: 1.5rem 0;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Sk-Modernist-Regular';
     font-weight: 400;
     text-align: left;
-    font-size: 0.9rem;
+    
 }
 
 

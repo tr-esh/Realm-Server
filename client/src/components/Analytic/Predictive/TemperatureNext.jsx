@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/SingleMetric.css';
 import TollRoundedIcon from '@mui/icons-material/TollRounded';
+import moment from 'moment';
 
 const TemperatureNext = () => {
   const [predictions, setPredictions] = useState([]);
@@ -9,7 +10,7 @@ const TemperatureNext = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch('/api/realm/predictnext/temperature'); // Change 'temperature' to your initial metric type
+        const response = await fetch('/api/realm/predictnext/temperature');
         const jsonData = await response.json();
 
         if (jsonData.length > 0) {
@@ -17,20 +18,16 @@ const TemperatureNext = () => {
             value: item.values.value,
             timestamp: item.values.timestamp
           }));
-
-          // Append the new data to the existing predictions
-          setPredictions(prevPredictions => [
-            ...prevPredictions,
-            ...formattedData
-          ]);
-
-          // Keep only the 5 most recent predictions
-          setPredictions(prevPredictions =>
-            prevPredictions.slice(-5)
-          );
-        } else {
+      
+          // Append the new data to the existing predictions and then filter the last 5
+          setPredictions(prevPredictions => {
+            const updatedPredictions = [...prevPredictions, ...formattedData];
+            return updatedPredictions.slice(-5);  // Keep only the 5 most recent predictions
+          });
+      
+      } else {
           setError('Prediction data is not available.');
-        }
+      }      
       } catch (error) {
         console.error(error);
         setError('An error occurred while fetching data.');
@@ -49,10 +46,12 @@ const TemperatureNext = () => {
       <div className="predictions-container">
         {predictions.length > 0 ? (
           predictions.map((predict, index) => (
-            <div key={index} className="prediction" style={{ margin: 'auto' }}>
-               <TollRoundedIcon style={{color: '#8A6DC1'}} />
+            <div key={index} 
+                 className="prediction" 
+                 style={{ margin: 'auto' }}>
+               <TollRoundedIcon style={{color: '#8cacff'}} />
               <p className='Results'>{parseFloat(predict.value).toFixed(2)}</p>
-              <p className='Days'>{formatDate(predict.timestamp)}</p>
+              <p className='Days'>{moment.utc(predict.timestamp).format('ddd, MMM D, YYYY')}</p>
             </div>
           ))
         ) : error ? (

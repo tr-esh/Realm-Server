@@ -7,7 +7,7 @@ const TemperatureChart = () => {
   useEffect(() => {
     const fetchTemperatureData = async () => {
       try {
-        const response = await fetch('/api/realm/alldata'); // Replace with your API endpoint
+        const response = await fetch('/api/realm/alldata');
         const data = await response.json();
         
 
@@ -58,21 +58,30 @@ const TemperatureChart = () => {
   }, []);
 
   const tooltipStyle = {
-    fontFamily: 'Poppins', // Replace with the desired font family
+    fontFamily: 'Sk-Modernist-Regular', 
     fontSize: '0.9rem',
     fontWeight: '500',
-    backgroundColor: '#0d2135',
-    border: 'none'
+    border: 'none',
+    color: 'white'
   };
   
 
   return (
-    <div  style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+    <div  style={{ width: '100%', 
+                   height: '100%', 
+                   display: 'flex', 
+                   justifyContent: 'center', 
+                   alignItems: 'center'}}>
     <ResponsiveContainer>
       <LineChart data={temperatureData}>
         <XAxis dataKey="date" />
         <Tooltip contentStyle={tooltipStyle} />
-        <Line type="monotone" dataKey="temperature_value" name="Temperature" stroke="#8884d8" strokeWidth={3} dot={{ r: 3 }} />
+        <Line type="monotone" 
+              dataKey="temperature_value" 
+              name="Temperature" 
+              stroke="#09111c" 
+              strokeWidth={3} 
+              dot={{ r: 3 }} />
       </LineChart>
       </ResponsiveContainer>
     </div>

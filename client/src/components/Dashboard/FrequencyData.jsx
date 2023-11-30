@@ -1,10 +1,34 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, Text } from 'recharts';
+import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, Text, CartesianGrid} from 'recharts';
 import '../styles/Dashboard.css';
 
 const FrequencyData = () => {
   const [frequencyData, setFrequencyData] = useState([]);
-  const [hasNewData, setHasNewData] = useState(false); // Track whether new data has been fetched
+  const [lastWeekData, setLastWeekData] = useState([]); 
+  const [hasNewData, setHasNewData] = useState(false);
+  const [weekOfMonth, setWeekOfMonth] = useState(1); 
+  const [monthName, setMonthName] = useState(""); 
+
+  const ensureStartsWithSunday = (data) => {
+    const daysOrder = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    // If data is empty or already starts with Sunday, no need for adjustments
+    if (data.length === 0 || data[0].day === "Sunday") {
+      return data;
+    }
+
+    const firstDayIndex = daysOrder.indexOf(data[0].day);
+    const prependedDays = [];
+
+    for (let i = 0; i < firstDayIndex; i++) {
+      prependedDays.push({
+        day: daysOrder[i],
+        sum: 0
+      });
+    }
+
+    return [...prependedDays, ...data];
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -13,13 +37,32 @@ const FrequencyData = () => {
 
       if (response.ok) {
         if (json.length > 0) {
-          setFrequencyData(json);
-          setHasNewData(true); // Set to true only if new data is received
+          setHasNewData(true);
+          setFrequencyData(ensureStartsWithSunday(json));
+          setLastWeekData(json); // Adjust this as well if required
+        } else if (!hasNewData) {
+          setFrequencyData(ensureStartsWithSunday(lastWeekData));
         }
       }
     };
 
     fetchData();
+  }, [lastWeekData, hasNewData]);
+
+  useEffect(() => {
+    // Get the current date in PH timezone
+    const currentDateInPHString = new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" });
+    const currentDate = new Date(currentDateInPHString);
+
+    const currentDayOfMonth = currentDate.getDate();
+
+    // Calculate the week of the month
+    const calculatedWeekOfMonth = Math.ceil(currentDayOfMonth / 7);
+    setWeekOfMonth(calculatedWeekOfMonth);
+
+    const calculatedMonthName = currentDate.toLocaleString('en-US', { month: 'long', timeZone: "Asia/Manila" });
+    setMonthName(calculatedMonthName);
+
   }, []);
 
   const summedData = frequencyData.map((data) => ({
@@ -46,7 +89,7 @@ const FrequencyData = () => {
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
-      const sumValue = payload[0].payload.sum; // Get the sum value from payload
+      const sumValue = payload[0].payload.sum;
       return (
         <div className="custom-tooltip">
           <p className="tooltip-value">{sumValue}</p>
@@ -57,40 +100,47 @@ const FrequencyData = () => {
     return null;
   };
 
-  const graphIllustration = new URL('../../img/graph_illustration.png', import.meta.url)
-
+  const graphIllustration = new URL('../../img/graph_illustration.png', import.meta.url);
 
   return (
-    <div className="frequency-chart" style={{ width: '35rem' }}>
-      {frequencyData.length > 0 || hasNewData ? ( // Check if there's existing data or new data
+    <div className="frequency-chart" 
+         style={{ width: '35rem' }}>
+      <p className='week-contain' 
+         style={{ letterSpacing: '0',}}> 
+         Week {weekOfMonth} | {monthName} </p> 
+      {/* Display the week of the month and the month name */}
+      {frequencyData.length > 0 || hasNewData ? (
         <ResponsiveContainer width="100%" height={210}>
           <AreaChart data={summedData}>
             <XAxis
               dataKey="day"
               axisLine={false}
               tickLine={false}
-              interval={0} // Display all labels
+              interval={0}
               padding={{ left: 10, right: 10 }}
               tick={<CustomizedAxisTick />}
-            />
-
-            <Tooltip content={<CustomTooltip />} />
+              />
+              <CartesianGrid stroke="#212e40" strokeDasharray="3 3"/>
+            <Tooltip content={<CustomTooltip />} 
+              />
             <Area
               type="monotone"
               dataKey="sum"
               stackId="1"
               stroke="#4E79B4"
               fill="#4E79B4"
+              strokeWidth={4}
               fillOpacity={0.3}
-              dot={{ r: 3 }}
-              gap={0} // Adjust this value to reduce the gap between areas
-              barSize={5} // Adjust the barSize to make areas closer together
+              gap={0}
+              barSize={5}
             />
           </AreaChart>
         </ResponsiveContainer>
       ) : (
         <img
-          style={{ width: '17rem', display: 'block', margin: 'auto' }}
+          style={{ width: '17rem', 
+                   display: 'block', 
+                   margin: 'auto' }}
           src={graphIllustration}
           alt="No data available"
         />

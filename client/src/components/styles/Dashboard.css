@@ -7,14 +7,37 @@
     padding-left: 2rem;
     padding-bottom: 1.5rem;
     color: white;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Sk-Modernist-Regular';
     font-size: 2.5rem;
     font-weight: 700;
     text-align: start;
 }
 
 .Typography {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Sk-Modernist-Regular';
+}
+.stat-name{
+    font-family: "Sk-Modernist-Regular";
+    letter-spacing: 0.1rem;
+    font-size: 3rem;
+}
+.status-holder{
+        font-weight: 600;
+        color:#0A1929; 
+        padding-bottom: 1.5rem;
+        font-family: 'Poppins';
+        letter-spacing: 0.1rem;
+        font-size: 3rem;
+
+}
+
+.week-contain{
+    font-family: 'Sk-Modernist-Regular';
+    align-items: start;
+    text-align: right;
+    font-size: 0.9rem;
+    margin-top: -2rem;
+    font-weight: 400;
 }
 
 .Status {
@@ -40,14 +63,17 @@
 .dataTurbid>span {
     font-size: 1.3rem;
 }
+
 .Tempstamp>span {
     font-size: 1.1rem;
     text-transform: uppercase;
 }
+
 .phtamp>span {
     font-size: 1.1rem;
     text-transform: uppercase;
 }
+
 .turbidstamp>span {
     font-size: 1.1rem;
     text-transform: uppercase;
@@ -83,28 +109,31 @@
 }
 
 
-.solid{
+.solid {
     border-top: 3px solid #7da4cc;
     position: absolute;
-  }
+}
 
-
-  .custom-progress-bar .CircularProgressbar-text {
+.custom-progress-bar .CircularProgressbar-text {
     font-weight: 700;
 }
-.anomaly-tag{
-    font-family: 'Poppins';
+
+.anomaly-tag {
+    font-family: "Sk-Modernist-Regular";
+    letter-spacing: 0.1rem;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     margin-top: 0.7rem;
     text-align: left;
     margin-left: 0.8rem;
 }
-.anomaly-san{
-    color: #66B2FF;
+
+.anomaly-san {
+    color: #8cacff;
 }
-.custom-tooltip{
-    font-family: 'Poppins';
+
+.custom-tooltip {
+    font-family: 'Sk-Modernist-Regular';
     width: 3rem;
     height: 3rem;
     border-radius: 0.7rem;
@@ -112,29 +141,25 @@
     font-size: 0.8rem;
     display: table; 
 }
-.tooltip-value{
+
+.tooltip-value {
     text-align:center; 
     vertical-align: middle;
     display: table-cell;
 }
-.frequency-chart{
-    margin-top: 0.3rem;
+
+.frequency-chart {
+    margin-top: 0.5rem;
 }
 
-@media screen and (max-width: 1200px ) {
-    .item{
-        display: flex;
-        flex-direction: column;
-    }
-
-    .Grid>.card{
-        height: 14rem;
-        width: 20rem;
+@media screen and (max-width: 1366px ) {
+    .Dashboard {
+        margin: 4rem 2rem;
     }
 
     
 }
 
-.mainCon{
+.mainCon {
     width: 40vw;
 }

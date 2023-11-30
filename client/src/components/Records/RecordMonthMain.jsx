@@ -9,18 +9,18 @@ import '../styles/RecordMonthMain.css'
 import '../styles/RecordMonthSide.css'
 import { useNavigate, useLocation } from "react-router-dom";
 import { Paper,
-  TableContainer,
-  Table, 
-  TableHead, 
-  TableRow, 
-  TableBody, 
-  TableCell, 
-  TablePagination
-  } from '@mui/material'
+         TableContainer,
+         Table, 
+         TableHead, 
+         TableRow, 
+         TableBody, 
+         TableCell, 
+         TablePagination
+         } from '@mui/material'
 import '../styles/RecordMonthTable.css'
 import moment from 'moment';
 import OpacityRoundedIcon from '@mui/icons-material/OpacityRounded';
-
+import * as writeXLSX from 'xlsx';
 
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -31,7 +31,7 @@ const Item = styled(Paper)(({ theme }) => ({
     borderRadius: '2.6rem',
     fontWeight: '600',
     fontSize: '1rem',
-    fontFamily: 'Poppins, sans-serif',
+    fontFamily: 'Sk-Modernist-Regular',
     color: '#7da4cc',
     boxShadow: 'none',
   }));
@@ -55,6 +55,8 @@ const Item = styled(Paper)(({ theme }) => ({
     };  
 
   const noData = new URL('../../img/empty_data.png', import.meta.url)
+  const dldata = new URL('../../img/xlsx-file.png', import.meta.url)
+
 
   const parameter = { temperature: 'TEMPERATURE', 
                      turbidity: 'TURBIDITY',
@@ -78,6 +80,55 @@ const Item = styled(Paper)(({ theme }) => ({
     setData(newData);
     setType(newType);
     setSelectedButton(buttonName);
+    setPage(0); // Resetting the page state here
+}
+
+  const handleExport = (filteredData) => {
+    const mappedData = filteredData.map(({ id, sensor, type, value, status, createdAt }) => ({
+        id,
+        sensor,
+        type,
+        value: Array.isArray(value) ? value.join(', ') : value,
+        status,
+        createdAt: new Date(createdAt).toLocaleString('en-PH', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+        }),
+    }));
+
+    const wb = writeXLSX.utils.book_new();
+
+    const tempData = mappedData.filter(({ type }) => type === 'temperature');
+    const turbidData = mappedData.filter(({ type }) => type === 'turbidity');
+    const phData = mappedData.filter(({ type }) => type === 'pH');
+
+    const tempSheet = writeXLSX.utils.json_to_sheet(tempData);
+    const turbidSheet = writeXLSX.utils.json_to_sheet(turbidData);
+    const phSheet = writeXLSX.utils.json_to_sheet(phData);
+
+    writeXLSX.utils.book_append_sheet(wb, tempSheet, 'Temperature');
+    writeXLSX.utils.book_append_sheet(wb, turbidSheet, 'Turbidity');
+    writeXLSX.utils.book_append_sheet(wb, phSheet, 'pH');
+
+    const wbout = writeXLSX.write(wb, { type: 'binary', bookType: 'xlsx' });
+
+    const fileName = `${monthName.toLowerCase()}_logs.xlsx`;
+    const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+  };
+
+  function s2ab(s) {
+      const buf = new ArrayBuffer(s.length);
+      const view = new Uint8Array(buf);
+      for (let i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xff;
+      return buf;
   }
 
   const handleChangePage = (event, newPage) => {
@@ -95,120 +146,149 @@ const Item = styled(Paper)(({ theme }) => ({
 
   return (
 
-    
+  <div className="monthMainContainer" 
+       style={{ display: 'grid', 
+                gridTemplateColumns: '73rem auto'}}
+    >
 
-  <div className="monthMainContainer" style={{ display: 'grid', gridTemplateColumns: '73rem auto'}}>
-
-
-    
-    <Grid className='Record-Month-Main' style={{  height: '60rem'}}>
-        <Item style={{  height: '7rem', margin: '3rem 4rem',
-                padding: '2rem 1rem', alignItems: 'center'}} >
+    <Grid className='Record-Month-Main' 
+          style={{  height: '60rem'}}>
+        <Item style={{  height: '7rem', 
+                        margin: '3rem 4rem',
+                        padding: '2rem 1rem', 
+                        alignItems: 'center'}}
+          >
                   <div className="header-month" 
-                      style={{ marginTop: '2rem',
-                               display: 'grid', 
-                               gridTemplateColumns: '25rem auto'}}>
-
-                      <div style={{  fontFamily: 'Poppins, sans-serif', 
-                                fontWeight: '600', 
-                                lineHeight: '0.8', 
-                                textAlign: 'start', 
-                                width: '8rem', 
-                                paddingLeft:'2rem'}} >
+                       style={{ marginTop: '2rem',
+                                display: 'grid', 
+                                gridTemplateColumns: '25rem auto'}}
+                    >
+                      <div style={{  fontFamily: 'Sk-Modernist-Regular', 
+                                     fontWeight: '600', 
+                                     lineHeight: '0.8', 
+                                     textAlign: 'start', 
+                                     width: '8rem', 
+                                     paddingLeft:'2rem'}}
+                          >
 
                         <div style={{ display: 'flex' }}>
-                          <span onClick={navigatetoRecordLogs} className='backhome' style={{marginRight: '0.7rem'}}>
-                            <Tooltip title="Back" arrow style={{fontFamily:'Poppins'}}> 
-                              <KeyboardReturnRoundedIcon className='home-icon' sx={{fontSize:'2rem', color: '#BDD2CF', width: '3rem'}}/>
+                          <span onClick={navigatetoRecordLogs} 
+                                className='backhome' 
+                                style={{marginRight: '0.7rem'}}
+                                >
+                            <Tooltip title="Back" 
+                                     arrow style={{fontFamily:'Sk-Modernist-Regular'}}
+                                  > 
+                              <KeyboardReturnRoundedIcon className='home-icon' 
+                                                         sx={{ fontSize:'2rem', 
+                                                               color: '#BDD2CF', 
+                                                               width: '3rem'}}
+                                  />
                             </Tooltip>
                           </span>    
-                          <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <span style={{ color:'#66B2FF', width: '25rem', fontSize:'2rem', paddingTop:'0.4rem'}}>
+                          <div style={{ display: 'flex', 
+                                        flexDirection: 'column' }}>
+                            <span style={{ color:'#66B2FF', 
+                                           width: '25rem', 
+                                           fontSize:'2rem', 
+                                           paddingTop:'0.4rem'}}>
                               {monthName} Logs  {/* Here's the change */}
                             </span>
-                            <span style={{ color:'#FFFF', width: '25rem', fontSize:'13px', fontWeight: '400', paddingTop: '0.7rem'}}>
+                            <span style={{ color:'#FFFF', 
+                                           width: '25rem', 
+                                           fontSize:'13px', 
+                                           fontWeight: '400', 
+                                           paddingTop: '0.7rem'}}>
                               Never miss a beat with our log tracking solution.
                             </span>
                           </div>
                         </div>
 
-
-
-                        
-
-                        <div style={{marginTop:'-6rem', marginLeft: '26rem'}}>
-                              <div style={{ display: 'flex', marginTop:'1rem', 
-                                backgroundColor:'#0E2337',
-                                height: '6rem',
-                                width: '16rem',
-                                borderRadius: '2rem',
-                                alignItems:'center'}}>
-                                <span className='hero-icon-holder' style={{marginRight: '0.7rem',
-                                            backgroundColor: selectedButton === 'tempcolor' ? '#8A6DC1' :
-                                            selectedButton === 'ntucolor' ? '#F1918F' :
-                                            selectedButton === 'pHcolor' ? '#F5D087' : '#10273d'}}>
+                        <div style={{ marginTop:'-6rem', 
+                                      marginLeft: '26rem'}}
+                          >
+                              <div style={{ display: 'flex', 
+                                            marginTop:'1rem', 
+                                            backgroundColor:'#0E2337',
+                                            height: '6rem',
+                                            width: '16rem',
+                                            borderRadius: '2rem',
+                                            alignItems:'center'}}
+                                  >
+                                <span className='hero-icon-holder' 
+                                      style={{marginRight: '0.7rem',
+                                              backgroundColor: selectedButton === 'tempcolor' ? '#8A6DC1' :
+                                                               selectedButton === 'ntucolor' ? '#F1918F' :
+                                                               selectedButton === 'pHcolor' ? '#F5D087' : '#10273d'}}
+                                    >
                                   <DeviceThermostatRoundedIcon className='hero-icon'
-                                  sx={{fontSize:'2rem', color: '#eeeeee', width: '3rem'}}/>
+                                                               sx={{ fontSize:'2rem', 
+                                                                     color: '#eeeeee', 
+                                                                     width: '3rem'}} 
+                                      />
                                 </span>    
                                 <div style={{ display: 'flex', 
                                               flexDirection: 'column'}}>
                                   <span style={{ color:'#66B2FF', 
-                                                width: '25rem', 
-                                                fontSize:'1.3rem', 
-                                                paddingTop:'0.7rem'}}>
-                                            
-                                                  PARAMETER
+                                                 width: '25rem', 
+                                                 fontSize:'1.3rem', 
+                                                 paddingTop:'0.7rem'}}
+                                    >
+                                      PARAMETER
                                   </span>
 
                                   <span style={{ color:'#FFFF', 
-                                                  width: '25rem', 
-                                                  fontSize:'15.5px',
-                                                  fontWeight: '400',
-                                                  paddingTop: '0.3rem',
-                                                  textTransform:'uppercase'
-                                                  }}>
-                                                  {type}
+                                                 width: '25rem', 
+                                                 fontSize:'15.5px',
+                                                 fontWeight: '400',
+                                                 paddingTop: '0.3rem',
+                                                 textTransform:'uppercase'}}
+                                    >
+                                      {type}
                                   </span>
                                 </div>
                                 <span style={{ display: 'flex', 
-                                backgroundColor:'#0E2337',
-                                height: '6rem',
-                                width: '16rem',
-                                borderRadius: '2rem',
-                                alignItems:'center',
-                                marginLeft:'-13rem'}}>
-                                <span className='hero-icon-holder' style={{marginRight: '0.7rem',
-                                            backgroundColor: selectedButton === 'tempcolor' ? '#8A6DC1' :
-                                            selectedButton === 'ntucolor' ? '#F1918F' :
-                                            selectedButton === 'pHcolor' ? '#F5D087' : '#10273d'}}>
-                                  <ElectricMeterRoundedIcon className='hero-icon'
-                                  sx={{fontSize:'2rem', color: '#eeeeee', width: '3rem'}}/>
-                                </span>    
-                                <div style={{ display: 'flex', 
-                                              flexDirection: 'column'}}>
-                                  <span style={{ color:'#66B2FF', 
-                                                width: '25rem', 
-                                                fontSize:'1.3rem', 
-                                                paddingTop:'0.7rem'}}>
-                                            
-                                                  SENSOR TYPE
-                                  </span>
+                                               backgroundColor:'#0E2337',
+                                               height: '6rem',
+                                               width: '16rem',
+                                               borderRadius: '2rem',
+                                               alignItems:'center',
+                                               marginLeft:'-13rem'}}
+                                  >
+                                    <span className='hero-icon-holder' 
+                                          style={{ marginRight: '0.7rem',
+                                                   backgroundColor: selectedButton === 'tempcolor' ? '#8A6DC1' :
+                                                                    selectedButton === 'ntucolor' ? '#F1918F' :
+                                                                    selectedButton === 'pHcolor' ? '#F5D087' : '#10273d'}}
+                                        >
+                                      <ElectricMeterRoundedIcon className='hero-icon'
+                                                                sx={{ fontSize:'2rem', 
+                                                                      color: '#eeeeee', 
+                                                                      width: '3rem'}}/>
+                                    </span>    
+                                    <div style={{ display: 'flex', 
+                                                  flexDirection: 'column'}}>
+                                      <span style={{ color:'#66B2FF', 
+                                                     width: '25rem', 
+                                                     fontSize:'1.3rem', 
+                                                     paddingTop:'0.7rem'}}
+                                        >
+                                           SENSOR TYPE
+                                      </span>
 
-                                  <span style={{ color:'#FFFF', 
-                                                  width: '25rem', 
-                                                  fontSize:'15px',
-                                                  fontWeight: '400',
-                                                  paddingTop: '0.3rem',
-                                                  }}>
-                                                  {data}
-                                  </span>
-                                </div>
-                            </span> 
-
-                            </div> 
-
+                                      <span style={{ color:'#FFFF', 
+                                                      width: '25rem', 
+                                                      fontSize:'15px',
+                                                      fontWeight: '400',
+                                                      paddingTop: '0.3rem',
+                                                      }}>
+                                                      {data}
+                                      </span>
+                                    </div>
+                                </span> 
+                              </div> 
                         </div>
-                    </div>
+                      </div>
                   </div>
               </Item>
 
@@ -218,38 +298,54 @@ const Item = styled(Paper)(({ theme }) => ({
                 <div className="table-record">
                 {showTable ? (
                    data && type ? (
-                    //  <RecordMonthTable />
                     <div className='Month-Table'>
                           <Item style={{ borderRadius: '2rem' }}>
-                              <TableContainer  sx={{
-                                borderTopRightRadius: '35px',
-                                borderTopLeftRadius: '35px',
-                                '& th': {
-                                  color: 'rgba(96, 96, 96)',
-                                  backgroundColor: 'rgba(49, 87, 123, 1)',
-                                  position: 'sticky',
-                                  top: 0,
-                                },
-                                '&::-webkit-scrollbar': {
-                                  width: 20,
-                                },
-                                '&::-webkit-scrollbar-track': {
-                                  backgroundColor: '#0F263F',
-                                  borderRadius: 2,
-                                },
-                                '&::-webkit-scrollbar-thumb': {
-                                  backgroundColor: '#194069',
-                                  borderRadius: 2,
-                                },
-                              }}
-                              style={{ height: '500px', overflowY: 'scroll' }}>
+                              <TableContainer sx={{ borderTopRightRadius: '35px',
+                                                    borderTopLeftRadius: '35px',
+                                              "& th": {
+                                                color: "rgba(96, 96, 96)",
+                                                backgroundColor: "rgba(49, 87, 123, 1)",
+                                                position: 'sticky', 
+                                                top: 0,
+                                              },
+                                              "&::-webkit-scrollbar": {
+                                                display: 'none'  // This hides the scrollbar
+                                              }
+                                            }}
+                                              style={{ maxHeight: '510px', 
+                                                       overflowY: 'auto'  }}
+                                  >
                               <Table>
                                 <TableHead>
                                   <TableRow>
-                                    <TableCell style={{ color: 'white', fontFamily: 'Poppins, sans-serif', fontSize: '1rem', textAlign: 'center', borderBottom:'none' }}>Parameter Name</TableCell>
-                                    <TableCell style={{ color: 'white', fontFamily: 'Poppins, sans-serif', fontSize: '1rem', textAlign: 'center', borderBottom:'none' }}>Value</TableCell>
-                                    <TableCell style={{ color: 'white', fontFamily: 'Poppins, sans-serif', fontSize: '1rem', textAlign: 'center', borderBottom:'none' }}>Status</TableCell>
-                                    <TableCell style={{ color: 'white', fontFamily: 'Poppins, sans-serif', fontSize: '1rem', textAlign: 'center', borderBottom:'none'}}>Time & Date</TableCell>
+                                    <TableCell style={{ color: 'white', 
+                                                        fontFamily: 'Sk-Modernist-Regular', 
+                                                        fontSize: '1rem', 
+                                                        textAlign: 'center', 
+                                                        borderBottom:'none' }}>
+                                                          Parameter Name
+                                    </TableCell>
+                                    <TableCell style={{ color: 'white', 
+                                                        fontFamily: 'Sk-Modernist-Regular', 
+                                                        fontSize: '1rem', 
+                                                        textAlign: 'center', 
+                                                        borderBottom:'none' }}>
+                                                          Value
+                                    </TableCell>
+                                    <TableCell style={{ color: 'white', 
+                                                        fontFamily: 'Sk-Modernist-Regular', 
+                                                        fontSize: '1rem', 
+                                                        textAlign: 'center', 
+                                                        borderBottom:'none' }}>
+                                                          Status
+                                    </TableCell>
+                                    <TableCell style={{ color: 'white', 
+                                                        fontFamily: 'Sk-Modernist-Regular', 
+                                                        fontSize: '1rem', 
+                                                        textAlign: 'center', 
+                                                        borderBottom:'none'}}>
+                                                          Time & Date
+                                    </TableCell>
                                   </TableRow>
                                 </TableHead>
                                 <TableBody style={{ maxHeight: 20 }}>
@@ -257,118 +353,230 @@ const Item = styled(Paper)(({ theme }) => ({
                                     .filter((item) => item.type === type)
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((item, index) => (
-                                      <TableRow key={index} className={index % 2 === 0 ? 'even-row' : 'odd-row'}>
-                                      <TableCell style={{ color: 'white', textAlign: 'center', fontFamily: 'Poppins', textTransform: 'uppercase', borderBottom:'none'}}> {item.type}</TableCell>
-                                      <TableCell style={{ color: 'white', textAlign: 'center', fontFamily: 'Poppins' , borderBottom:'none'}}>{item.value}</TableCell>
-                                      <TableCell style={{ color: 'white', textAlign: 'center', fontFamily: 'Poppins', textTransform: 'uppercase' , borderBottom:'none' }}>{item.status}</TableCell>
-                                      <TableCell style={{ color: 'white', textAlign: 'center', fontFamily: 'Poppins', borderBottom:'none' }}>{moment(item.createdAt).format('LT[ • ]LL')}</TableCell>
+                                      <TableRow key={index} 
+                                                className={index % 2 === 0 ? 'even-row' : 'odd-row'}>
+                                      <TableCell style={{ color: 'white', 
+                                                          textAlign: 'center', 
+                                                          fontFamily: 'Sk-Modernist-Regular', 
+                                                          textTransform: 'uppercase', 
+                                                          borderBottom:'none'}}> 
+                                                          {item.type}
+                                      </TableCell>
+                                      <TableCell style={{ color: 'white', 
+                                                          textAlign: 'center', 
+                                                          fontFamily: 'Sk-Modernist-Regular' , 
+                                                          borderBottom:'none'}}>
+                                                            {item.value}
+                                      </TableCell>
+                                      <TableCell style={{ color: 'white', 
+                                                          textAlign: 'center', 
+                                                          fontFamily: 'Sk-Modernist-Regular', 
+                                                          textTransform: 'uppercase' , 
+                                                          borderBottom:'none' }}>
+                                                            {item.status}
+                                      </TableCell>
+                                      <TableCell style={{ color: 'white', 
+                                                          textAlign: 'center', 
+                                                          fontFamily: 'Sk-Modernist-Regular', 
+                                                          borderBottom:'none' }}>
+                                                            {moment(item.createdAt).format('LT[ • ]LL')}
+                                      </TableCell>
                                     </TableRow>
                                   ))}
                                 </TableBody>
                               </Table>
                             </TableContainer>
                               <TablePagination style={{color: 'white'}}
-                                  rowsPerPageOptions={[ 25, 45, 50]}
-                                  component="div"
-                                  count={paginatedData.length}
-                                  rowsPerPage={rowsPerPage}
-                                  page={page}
-                                  onPageChange={handleChangePage}
-                                  onRowsPerPageChange={handleChangeRowsPerPage}
-                                />
-                                    
+                                               rowsPerPageOptions={[ 25, 45, 50]}
+                                               component="div"
+                                               count={paginatedData.length}
+                                               rowsPerPage={rowsPerPage}
+                                               page={page}
+                                               onPageChange={handleChangePage}
+                                               onRowsPerPageChange={handleChangeRowsPerPage}
+                                />        
                           </Item>
-                      </div>
-
-                    
+                      </div>          
                     ) : (
-                      <img className='nodata-icon' style={{ width: '30rem', alignItems: 'center', marginTop: '8rem' }} src={noData} alt="Illustration" />
-                      
+                      <img className='nodata-icon' 
+                           style={{ width: '30rem', 
+                                    alignItems: 'center', 
+                                    marginTop: '8rem' }} 
+                           src={noData} 
+                           alt="Illustration" />
                     )
                   ) : (
-                      <img style={{ width: '30rem', alignItems: 'center', marginTop: '8rem' }} src={noData} alt="Illustration" />
+                      <img style={{ width: '30rem', 
+                                    alignItems: 'center', 
+                                    marginTop: '8rem' }} 
+                           src={noData} 
+                           alt="Illustration" />
                   )}  
-
-                    
                 </div>
               </Item>
       </Grid>                                          
 
-
-
       <Grid className='Record-Month-Side'>
           <div className='statement'> 
-          Unlock insights with 
-          <span style={{ color: '#66B2FF', marginLeft: '4px' }}>
-              organized data - Datasets!
-          </span>
-        </div>
+            Unlock insights with 
+            <span style={{ color: '#66B2FF', 
+                           marginLeft: '4px' }}>
+                organized data - Datasets!
+            </span>
+          </div>
         
-        <Item style={{marginTop:'3rem', width:'300px'}}>
+        <Item style={{ marginTop:'3rem', 
+                       width:'300px',
+                       backgroundColor: '#0f263f'}}>
             <div className="Card-top" 
-                  style={{ marginTop: '1rem', marginLeft:'0.2rem' }}>
-                <div className="heading-name" style={{fontSize:'1.rem'}}>
-                    <span style={{ color:'#FFFF', display: 'flex'}}>Select
-                    <Divider orientation="horizontal" 
-                            style={{ height: '1.2px', backgroundColor: '#bde0ff', width: '10.5rem', 
-                            marginTop: '1rem', marginLeft: '1rem'}}/> 
+                 style={{ marginTop: '1rem', 
+                          marginLeft:'0.2rem' }}>
+                <div className="heading-name" 
+                     style={{fontSize:'1.rem'}}>
+                    <span style={{ color:'#FFFF', 
+                                   display: 'flex'}}
+                      >
+                          Select
+                      <Divider orientation="horizontal" 
+                               style={{ height: '1.2px', 
+                                        backgroundColor: '#bde0ff', 
+                                        width: '10.5rem', 
+                                        marginTop: '1rem', 
+                                        marginLeft: '1rem'}}/> 
                     </span>
-                    <span style={{ color:'#66B2FF' }}>Parameter</span>
+                    <span style={{ color:'#66B2FF' }}>
+                        Parameter
+                    </span>
                     <div className="content2-text">
-                      <span style={{fontSize:'0.9rem'}}>
-                      Optimize your performance with the right parameters and 
-                      gain valuable insights into your operations and make data-driven decisions.
-                      </span>
+                      <p style={{fontSize:'1rem', lineHeight: '1'}}>
+                        Optimize your performance with the right parameters and 
+                        gain valuable insights into your operations and make data-driven decisions.
+                      </p>
                   </div>
                 </div>
             </div>
           </Item>
           
-                <div className='parameter-holder' style={{marginTop:'-5rem'}}> 
-                <Item> 
-                    <button onClick={() => handleClick( 0, params.temperature, 'DS18B209', 'temperature', 'tempcolor')}
-                        className={`param-container ${activeButtonsIndex === 0 ? 'active' : ''}`} > 
-                          <span className='icons-holder' style={{backgroundColor:'#8A6DC1'}}> 
-                            <OpacityRoundedIcon className='water-icon' sx={{ fontSize: 30, color:'#8A6DC1', paddingTop:'0.8rem'}}/> 
-                            </span>
+          <div className='parameter-holder' 
+               style={{marginTop:'-5rem'}}> 
+              <Item style={{ backgroundColor: '#0f263f' }}> 
+                    <button onClick={() => handleClick( 0, 
+                                                        params.temperature, 
+                                                        'DS18B209', 
+                                                        'temperature', 
+                                                        'tempcolor')}
+                            className={`param-container ${activeButtonsIndex === 0 ? 
+                                        'active' : ''}`} > 
+                          <span className='icons-holder' 
+                                style={{backgroundColor:'#8A6DC1'}}
+                            > 
+                            <OpacityRoundedIcon className='water-icon' 
+                                                sx={{ fontSize: 30, 
+                                                      color:'#8A6DC1', 
+                                                      paddingTop:'0.8rem'}}/> 
+                          </span>
                         
                         <div className='results'> 
-                        <span style={{textAlign:'center', paddingLeft:'0.6rem', color:'#ffff'}}>{parameter.temperature}
+                          <span style={{ textAlign:'center', 
+                                         paddingLeft:'0.6rem', 
+                                         color:'#ffff', fontSize: '1rem'}}>
+                            {parameter.temperature}
+                          </span>
+                        </div>
+                        <span style={{ color:'#66B2FF', 
+                                       fontSize:'0.8rem', 
+                                       fontWeight:'400', 
+                                       marginLeft:'-7rem', 
+                                       marginTop:'0.7rem'}}
+                          >  
+                            {filteredData.filter((item) => 
+                            item.type === 'temperature')
+                            .length} results  
                         </span>
-                        </div>
-                        <span style={{ color:'#66B2FF', fontSize:'0.7rem', fontWeight:'400', marginLeft:'-6.3rem', marginTop:'0.6rem'}}>  
-                        {filteredData.filter((item) => item.type === 'temperature').length} results  </span>
                     </button>
 
-                    <button onClick={() => handleClick(1, params.turbidity, 'SEN0189', 'turbidity', 'ntucolor')}
-                        className={`param-container ${activeButtonsIndex === 1 ? 'active' : ''}`} > 
-                          <span className='icons-holder' style={{backgroundColor:'#F1918F'}}> 
-                            <OpacityRoundedIcon className='water-icon' sx={{ fontSize: 30, color:'#F1918F', paddingTop:'0.8rem'}}/> 
+                    <button onClick={() => handleClick(1, 
+                                                       params.turbidity, 
+                                                       'SEN0189', 
+                                                       'turbidity', 
+                                                       'ntucolor')}
+                            className={`param-container ${activeButtonsIndex === 1 ? 
+                                        'active' : ''}`} > 
+                          <span className='icons-holder' 
+                                style={{backgroundColor:'#F1918F'}}
+                            > 
+                            <OpacityRoundedIcon className='water-icon' 
+                                                sx={{ fontSize: 30, 
+                                                      color:'#F1918F', 
+                                                      paddingTop:'0.8rem'}}/> 
+                          </span>
+                          <div className='results'> 
+                            <span style={{ textAlign:'center', 
+                                           marginLeft:'-1.1rem', 
+                                           color:'#ffff', fontSize: '1rem'}}>
+                                            {parameter.turbidity}
+                            </span>
+                          </div>
+                        <span style={{ color:'#66B2FF', 
+                                       fontSize:'0.7rem', 
+                                       fontWeight:'400', 
+                                       marginLeft:'-7rem', 
+                                       marginTop:'0.7rem'}}
+                          > 
+                            {filteredData.filter((item) => 
+                            item.type === 'turbidity')
+                            .length} results 
+                        </span>
+                    </button>
+
+
+                    <button onClick={() => handleClick(2, 
+                                                       params.phlevel, 
+                                                       'PH-4502C', 
+                                                       'pH', 
+                                                       'pHcolor')}
+                            className={`param-container ${activeButtonsIndex === 2 ? 
+                                        'active' : ''}`}> 
+                            <span className='icons-holder' 
+                                  style={{backgroundColor:'#F5D087'}}> 
+                              <OpacityRoundedIcon className='water-icon' 
+                                                  sx={{ fontSize: 30, 
+                                                        color:'#F5D087', 
+                                                        paddingTop:'0.8rem'}}/> 
                             </span>
                             <div className='results'> 
-                        <span style={{textAlign:'center', marginLeft:'-1.1rem', color:'#ffff'}}>{parameter.turbidity}</span>
-                        </div>
-                        <span style={{ color:'#66B2FF', fontSize:'0.7rem', fontWeight:'400', marginLeft:'-6.4rem', marginTop:'0.6rem'}}> 
-                        {filteredData.filter((item) => item.type === 'turbidity').length} results </span>
-                    </button>
-
-
-                    <button onClick={() => handleClick(2, params.phlevel, 'PH-4502C', 'pH', 'pHcolor')}
-                         className={`param-container ${activeButtonsIndex === 2 ? 'active' : ''}`}> 
-                          <span className='icons-holder' style={{backgroundColor:'#F5D087'}}> 
-                            <OpacityRoundedIcon className='water-icon' sx={{ fontSize: 30, color:'#F5D087', paddingTop:'0.8rem'}}/> 
+                              <span style={{ textAlign:'center', 
+                                              marginLeft:'-1.4rem', 
+                                              color:'#ffff', fontSize: '1rem'}}>
+                                    {parameter.phlevel}
+                              </span>
+                            </div>
+                            <span style={{ color:'#66B2FF', 
+                                           fontSize:'0.7rem', 
+                                           fontWeight:'400', 
+                                           marginLeft:'-7rem', 
+                                           marginTop:'0.7rem'}}
+                              > 
+                                {filteredData.filter((item) => 
+                                item.type === 'pH')
+                                .length} results 
                             </span>
-                            <div className='results'> 
-                        <span style={{textAlign:'center', marginLeft:'-1.4rem', color:'#ffff'}}>{parameter.phlevel}</span>
-                        </div>
-                        <span style={{ color:'#66B2FF', fontSize:'0.7rem', fontWeight:'400', marginLeft:'-6.4rem', marginTop:'0.7rem'}}> 
-                        {filteredData.filter((item) => item.type === 'pH').length} results </span>
                     </button>
-                </Item>
-                </div>  
+
+                   <div className='export-contain'>
+                        <div className="export-btn">
+                          <img  src={dldata} className='dldata-pik' alt='download' />   
+                        </div>     
+                        <div className='export-main-btn'
+                             onClick={() => handleExport(filteredData)}
+                             >   
+                          export data
+                        </div>
+                    </div> 
+              </Item>
+           </div>  
       
       </Grid>
-
     </div>
   )
 }

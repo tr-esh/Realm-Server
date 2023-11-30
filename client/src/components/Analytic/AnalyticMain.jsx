@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { Button, Menu, MenuItem } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
@@ -9,7 +9,6 @@ import TemperatureChart from './LineGraphs/TemperatureChart';
 import TurbidityChart from './LineGraphs/TurbidityChart';
 import PhLevelChart from './LineGraphs/PhLevelChart';
 import Summary from './SummaryGraphs/Summary';
-// import ParametersPie from './Details/DetailSection';
 import MonthlyParameter from './Details/MonthlyParameter';
 import TemperaturePrediction from './Predictive/TemperaturePrediction';
 import TurbidityPrediction from './Predictive/TurbidityPrediction';
@@ -17,17 +16,18 @@ import PhPrediction from './Predictive/PhPrediction';
 import TemperatureNext from './Predictive/TemperatureNext'
 import TurbidityNext from './Predictive/TurbidityNext'
 import PhNext from './Predictive/PhNext'
+import '../styles/Analytics.css'
 
 
 const options = [
-  { label: 'TEMPERATURE', color: '#8A6DC1' },
-  { label: 'TURBIDITY',   color: '#F1918F' },
-  { label: 'PH',          color: '#F5D087' },
+  { label: 'TEMPERATURE', color: '#09111c' },
+  { label: 'TURBIDITY',   color: '#09111c' },
+  { label: 'PH',          color: '#09111c' },
 ]; 
 
 
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1e88e5' : '#10273d',
+  backgroundColor: theme.palette.mode === 'dark' ? '#0A1929' : '#0A1929',
   ...theme.typography.body2,
   padding: theme.spacing(1),
   textAlign: 'center',
@@ -46,11 +46,11 @@ const AnalyticMain = () => {
 
   const [highRecord, setHighRecord] = useState({ parameter: null, value: null, date: null });
   const [lowRecord, setLowRecord] = useState({ parameter: null, value: null, date: null });
-  const [selectedOption, setSelectedOption] = useState(options[0]);
   const [showSummary, setShowSummary] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const [currentChart, setCurrentChart] = useState('TEMPERATURE');
   const { parameter } = useParams();
+  const navigate = useNavigate();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -61,23 +61,26 @@ const AnalyticMain = () => {
   };
   
   const handleMenuItemClick = (option) => {
-    setSelectedOption(option);
+    navigate(`/Analytics/${option.label.toLowerCase()}`);
     handleClose();
+  };
+
+  const getColorForChart = (chart) => {
+    const option = options.find((o) => o.label === chart);
+    return option ? option.color : "#FFFFFF"; // default to white if not found
   };
 
 
   useEffect(() => {
-    const fetchParameterData = async (option) => {
+    const fetchParameterData = async () => {
       try {
-        const response = await fetch('/api/realm/alldata'); // Replace with your API endpoint
+        const response = await fetch('/api/realm/alldata');
         const data = await response.json();
   
-        // Filter data based on the selected option label
-        const filteredData = data.filter(item => item.type === option.label);
-  
-        // Map the parameter data based on the selected option label
+        const filteredData = data.filter(item => item.type === currentChart);
+        
         let parameterData = [];
-        switch (option.label) {
+        switch (currentChart) {
           case 'TEMPERATURE':
             parameterData = filteredData.map(item => item.temperature_value);
             break;
@@ -104,27 +107,34 @@ const AnalyticMain = () => {
             }
           }
         });
-  
+
+        const matchedOption = options.find(option => option.label === currentChart);
+        const imgStyle = matchedOption ? { backgroundColor: matchedOption.color } : {};
+
         setHighRecord({
-          parameter: option.label,
+          parameter: currentChart,
           value: recordHigh,
-          date: new Date(data[parameterData.indexOf(recordHigh)].createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }),
-          imgStyle: { backgroundColor: option.color }
+          date: new Date(data[parameterData.indexOf(recordHigh)].createdAt)
+         .toLocaleString('default', { month: 'long', year: 'numeric' }),
+          imgStyle: imgStyle
         });
   
         setLowRecord({
-          parameter: option.label,
+          parameter: currentChart,
           value: recordLow,
-          date: new Date(data[parameterData.indexOf(recordLow)].createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }),
-          imgStyle: { backgroundColor: option.color }
+          date: new Date(data[parameterData.indexOf(recordLow)].createdAt)
+          .toLocaleString('default', { month: 'long', year: 'numeric' }),
+          imgStyle: imgStyle
         });
       } catch (error) {
         console.error('Error:', error);
       }
     };
-  
-      fetchParameterData(selectedOption);
-  }, [selectedOption]);
+    
+    fetchParameterData();
+    
+  }, [currentChart]);
+
 
   useEffect(() => {
     if (parameter && typeof parameter === 'string') {
@@ -133,23 +143,20 @@ const AnalyticMain = () => {
  }, [parameter]);
  
 
-  const upIcon = new URL('../../img/icons8-redUp.png', import.meta.url)
-  const downIcon = new URL('../../img/icons8-ydown.png', import.meta.url)
+  const upIcon = new URL('../../img/rise.png', import.meta.url)
+  const downIcon = new URL('../../img/decrease.png', import.meta.url)
 
-  const handleToggle = (summary) => {
-    setShowSummary(summary);
-  };
-
-  const borderWidth = 3;
 
 
   return (
-    <div style={{ margin: '4rem 8rem'}} className='analytic-main'>
+    <div style={{ margin: '4rem 8rem'}} 
+         className='analytic-main'>
+      
       <Grid container spacing={2}>
         <Grid xs={6} md={8}>
           <Item 
             style={{ height: '22rem', 
-            backgroundColor: '#122B44', 
+            backgroundColor: '#0A1929', 
             marginTop: '1.5rem' }}>
           
           <div className='header-holder' 
@@ -167,7 +174,7 @@ const AnalyticMain = () => {
                 border: 'none', 
                 marginRight: '1rem', 
                 color: 'white', 
-                fontFamily: 'Poppins'
+                fontFamily: 'Sk-Modernist-Regular'
               }}
             >
               SUMMARY OF FINDINGS
@@ -180,14 +187,16 @@ const AnalyticMain = () => {
                 background: 'none', 
                 border: 'none', 
                 color: 'white', 
-                fontFamily: 'Poppins' 
+                fontFamily: 'Sk-Modernist-Regular' 
               }}
             >
               MORE DETAILS
             </button>
           </div>
 
-          <div className='MainGraph' style={{ padding: '2rem', height: '16rem'}}>
+          <div className='MainGraph' 
+               style={{ padding: '2rem', 
+               height: '16rem'}}>
           {showSummary ? <Summary /> : <MonthlyParameter />}
         </div>
       </Item>
@@ -196,7 +205,7 @@ const AnalyticMain = () => {
         <Grid xs={6} md={4}>
           <Item 
           style={{  height: '22rem', 
-                    backgroundColor: '#122B44', 
+                    backgroundColor: '#8cacff', 
                     marginTop: '1.5rem', 
                     marginLeft: '1rem'}}>
           
@@ -205,13 +214,13 @@ const AnalyticMain = () => {
                           flexDirection: 'row', 
                           paddingTop: '1.5rem' }}>
             
-            <p style={{fontSize: '0.8rem', 
+            <p style={{fontSize: '1rem', 
                        textAlign: 'left',  
                        paddingTop: '0.5rem', 
                        paddingLeft:'2rem', 
                        paddingRight: '4.5rem', 
                        paddingBottom: '0.5rem', 
-                       fontFamily: 'Poppins'}}> 
+                       fontFamily: 'Sk-Modernist-Regular', color:'#09111c'}}> 
                        
                        RECORD OVERVIEW </p> 
 
@@ -220,19 +229,19 @@ const AnalyticMain = () => {
                       onClick={handleClick}
                       endIcon={<ArrowDropDownIcon />} 
                       sx={{
-                        backgroundColor: selectedOption.color,
+                        backgroundColor: getColorForChart(currentChart),
                         '&:hover': { 
-                          backgroundColor: selectedOption.color,
+                          backgroundColor: getColorForChart(currentChart),
                           opacity: 0.8
                         },
                         borderRadius: 5,
                         color: 'white',
-                        width: 130,  // Set width
-                        height: 40,  // Set height
+                        width: 130, 
+                        height: 40, 
                         fontSize: '0.7rem'
                       }}
               >
-                {selectedOption.label}
+                {currentChart}
               </Button>
               <Menu
                 id="simple-menu"
@@ -242,64 +251,139 @@ const AnalyticMain = () => {
                 onClose={handleClose}
                 sx={{
                   '.MuiPaper-root': {
-                    backgroundColor: 'rgba(13, 33, 53, 0.32)', // Set the menu background color
+                    backgroundColor: 'rgba(13, 33, 53, 0.32)', 
                     boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
                     backdropFilter: 'blur(5px)',
                     WebkitBackdropFilter: 'blur(5px)',
                     color: 'white',
                     fontSize: '0.5rem',
-                    fontFamily: 'Poppins',
+                    fontFamily: 'Sk-Modernist-Regular',
                   },
                   '.MuiMenuItem-root': {
-                    fontSize: '0.8rem',  // Set the font size
-                    fontFamily: 'Poppins'
+                    fontSize: '0.8rem', 
+                    fontFamily: 'Sk-Modernist-Regular'
                   }
                 }}
               >
                 {options.map((option) => (
-                  <MenuItem key={option.label} onClick={() => handleMenuItemClick(option)}>{option.label}</MenuItem>
+                  <MenuItem key={option.label} 
+                            onClick={() => handleMenuItemClick(option)}>
+                            {option.label}
+                  </MenuItem>
                 ))}
               </Menu>
 
             </div>
-            <div className='data-record' style={{textAlign: 'left', padding: '1rem 2rem', display: 'flex', flexDirection: 'column'}}>
-              
-           
-              <div className='line-graph' style={{ height: '7rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}> 
-                  {selectedOption.label === 'TEMPERATURE'
+            <div className='data-record' 
+                 style={{textAlign: 'left', 
+                         padding: '1rem 2rem', 
+                         display: 'flex', 
+                         flexDirection: 'column'}}
+              >
+              <div className='line-graph' 
+                   style={{ height: '7rem', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center' }}> 
+                  {currentChart === 'TEMPERATURE'
                     ? <TemperatureChart />
-                    : selectedOption.label === 'TURBIDITY'
+                    : currentChart === 'TURBIDITY'
                       ? <TurbidityChart  />
                       : <PhLevelChart />
                   }
               </div>
               
-              <div className='bottom-record' style={{ color: 'white', margin: 'auto' }}>
+              <div className='bottom-record' 
+                   style={{ color: 'white', margin: 'auto' }}>
+                
                 {highRecord.value !== null && lowRecord.value !== null && (
                   <div>
-                    <div className='high-record' style={{ display: 'flex', flexDirection: 'row' }}>
-                      <div style={{ backgroundColor: '#453245', width: '3rem', height: '3rem', borderRadius: '1rem', display: 'flex', alignItems:'center', justifyContent:'center', marginTop: '3.5px'}}>
-                        <img style={{ width: '2rem' }} src={upIcon} alt='up'></img>
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 0.9, margin: '0.4rem 1rem' }}>
-                        <span style={{ fontFamily: 'Inter', fontSize: '0.7rem', fontWeight: '400', textTransform: 'uppercase', paddingBottom: '0.3rem' }}> {highRecord.date}</span>
-                        <span style={{ fontSize: '1.5rem', fontFamily: 'Poppins' }}> {highRecord.value} {selectedOption.label === 'TEMPERATURE' ? '°C' : (selectedOption.label === 'TURBIDITY' ? 'NTU' : 'PH')}</span>
-                        <span style={{ fontFamily: 'Poppins', fontSize: '0.5rem', fontWeight: '400', textTransform: 'uppercase' }}> Recorded High </span>
+                    <div className='high-record' 
+                         style={{ display: 'flex', flexDirection: 'row' }}>
+                      <div 
+                         style={{ backgroundColor: '#09111c', 
+                                  width: '3.5rem', 
+                                  height: '3.5rem', 
+                                  borderRadius: '1rem', 
+                                  display: 'flex', 
+                                  alignItems:'center', 
+                                  justifyContent:'center', 
+                                  marginTop: '3.5px'}}>
+                           <img style={{ width: '2rem' }} 
+                                src={upIcon} alt='up'>
+                          </img>
+                   </div>
+                      
+                      <div 
+                         style={{ display: 'flex', 
+                         flexDirection: 'column', 
+                         lineHeight: 0.9, 
+                         margin: '0.4rem 1rem' }}>
+                        <span style={{ fontFamily: 'Sk-Modernist-Regular', 
+                              fontSize: '0.7rem', 
+                              fontWeight: '400', 
+                              textTransform: 'uppercase', 
+                              paddingBottom: '0.1rem' , color: '#09111c'}}> {highRecord.date}</span>
+                        <span style={{ fontSize: '2.3rem', 
+                                       fontFamily: 'Sk-Modernist-Regular', color: '#09111c' }}> 
+                                      {highRecord.value} {currentChart === 
+                                      'TEMPERATURE' ? '°C' : (currentChart === 
+                                      'TURBIDITY' ? 'NTU' : 'PH')}
+                        </span>
+                        <span style={{ fontFamily: 'Sk-Modernist-Regular',
+                                       fontSize: '0.5rem', 
+                                       fontWeight: '400', 
+                                       textTransform: 'uppercase', color: '#09111c', paddingTop: '0.1rem'}}> Recorded High 
+                        </span>
                       </div>
                     </div>
 
-                    <div className='low-record' style={{ display: 'flex', flexDirection: 'row', marginTop: '0.5rem' }}>
-                      <div style={{ backgroundColor: '#595E4D', width: '3rem', height: '3rem', borderRadius: '1rem', display: 'flex', alignItems:'center', justifyContent:'center', margin: 'auto'}}>
-                        <img style={{ width: '2rem' }} src={downIcon} alt='down'></img>
+                    <div className='low-record' 
+                         style={{ display: 'flex', 
+                                  flexDirection: 'row', 
+                                  marginTop: '0.5rem' }}>
+                      <div 
+                         style={{ backgroundColor: '#09111c', 
+                                  width: '3.5rem', 
+                                  height: '3.5rem', 
+                                  borderRadius: '1rem', 
+                                  display: 'flex', 
+                                  alignItems:'center', 
+                                  justifyContent:'center', 
+                                  margin: 'auto'}}>
+                             <img style={{ width: '2rem' }} src={downIcon} alt='down'>
+                         </img>
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 0.9, margin: '0.4rem 1rem' }}>
-                        <span style={{ fontFamily: 'Inter', fontSize: '0.7rem', fontWeight: '400', textTransform: 'uppercase', paddingBottom: '0.3rem' }}> {lowRecord.date} </span>
-                        <span style={{ fontSize: '1.5rem', fontFamily: 'Poppins' }}>  {lowRecord.value} {selectedOption.label === 'TEMPERATURE' ? '°C' : (selectedOption.label === 'TURBIDITY' ? 'NTU' : 'PH')}
+                      <div 
+                          style={{ display: 'flex', 
+                                   flexDirection: 'column', 
+                                   lineHeight: 0.9, 
+                                   margin: '0.4rem 1rem' }}>
+                        <span 
+                            style={{ fontFamily: 'Sk-Modernist-Regular', 
+                                     fontSize: '0.7rem', 
+                                     fontWeight: '400', 
+                                     textTransform: 'uppercase', 
+                                     paddingBottom: '0.1rem', color: '#09111c'}}> 
+                                     {lowRecord.date} 
                         </span>
-                        <span style={{ fontFamily: 'Inter', fontSize: '0.5rem', fontWeight: '400', textTransform: 'uppercase' }}> Recorded Low </span>
+                        <span 
+                            style={{ fontSize: '2.3rem', 
+                                     fontFamily: 'Sk-Modernist-Regular' , color: '#09111c'}}>  
+                                     {lowRecord.value} {currentChart === 
+                                     'TEMPERATURE' ? '°C' : (currentChart === 
+                                     'TURBIDITY' ? 'NTU' : 'PH')}
+                        </span>
+                        <span 
+                            style={{ fontFamily: 'Inter', 
+                                     fontSize: '0.5rem', 
+                                     fontWeight: '400', 
+                                     textTransform: 'uppercase', 
+                                     color:'#09111c', paddingTop: '0.1rem'}}> Recorded Low 
+                        </span>
                       </div>
                     </div>
-                    </div>
+                </div> 
                 )}
               </div>
 
@@ -310,26 +394,32 @@ const AnalyticMain = () => {
         </Grid>
 
         <Grid xs={6} md={12}>
-          <Item style={{  height: '20rem', background: 'linear-gradient(0deg, rgba(15,38,60,0) 0%, rgba(16,39,61,1) 100%)', marginTop: '1rem'}}>
-          <div className='header-holder' style={{ display: 'flex', alignItems: 'center', padding: '1rem' }}>
+          <Item style={{  height: '19rem', 
+                background: 'linear-gradient(0deg, rgba(15,38,60,0) 0%, rgba(16,39,61,1) 100%)', 
+                marginTop: '1rem'}}>
+          <div className='header-holder' 
+               style={{ display: 'flex', alignItems: 'center', padding: '1rem' }}>
 
-              {/* Buttons to choose which chart to display */}
-              <div className='chart-toggle-buttons'style={{ paddingLeft:'1rem' }}>
+              <div className='chart-toggle-buttons' 
+                   style={{ display: 'flex', width: '100%' }}>
                 {options.map(option => (
                   <button
                     key={option.label}
                     onClick={() => setCurrentChart(option.label)}
                     style={{
+                      flex: 1,  
                       background: 'transparent',
                       color: 'white',
                       paddingTop: '3px',
-                      marginRight: '50px',
+                      paddingBottom: '10px',
                       border: 'none',
                       cursor: 'pointer',
                       fontSize: '0.8rem',
-                      fontFamily: 'Poppins',
+                      fontFamily: 'Sk-Modernist-Regular',
                       fontWeight: '200',
-                      borderBottom: currentChart === option.label ? `2px solid ${option.color}` : 'none'  // Set borderBottom using option.color
+                      borderBottom: currentChart === 
+                        option.label ? '2px solid #8cacff' : 'none',
+                      textAlign: 'center',  
                     }}
                   >
                     {option.label}
@@ -339,49 +429,60 @@ const AnalyticMain = () => {
           </div>
 
 
-            <div className='predictive-chart' style={{ height: '50%', margin: 'auto' }}>
-            <div style={{ fontSize: '1.3rem', fontFamily: 'Poppins', fontWeight: '600', marginBottom: '0.5rem' }}>
-                WATER QUALITY <span style={{color: '#66B2FF'}}> FORECAST </span>
-              </div>
-              <div className='chart-swipe'style={{ height: '18rem', width: '100%', margin: 'auto' }}>
-                {currentChart === 'TEMPERATURE' && <TemperaturePrediction />}
-                {currentChart === 'TURBIDITY' && <TurbidityPrediction />}
-                {currentChart === 'PH' && <PhPrediction />}
+            <div className='predictive-chart' 
+                 style={{ height: '50%', margin: 'auto' }}>
+            <div style={{ fontSize: '1.5rem', 
+                          fontFamily: 'Sk-Modernist-Regular', 
+                          fontWeight: '600', 
+                          marginBottom: '0.5rem' }}>
+                          WATER QUALITY 
+                          
+                          <span style={{color: '#8cacff'}}> FORECAST 
+                          </span>
+            </div>
+              <div className='chart-swipe'
+                   style={{ height: '17rem', width: '100%', margin: 'auto' }}>
+                {currentChart === 
+                'TEMPERATURE' && <TemperaturePrediction />}
+                {currentChart === 
+                'TURBIDITY' && <TurbidityPrediction />}
+                {currentChart === 
+                'PH' && <PhPrediction />}
               </div>
             </div>
           </Item>
         </Grid>
 
         <Grid container spacing={2}>
-        <Grid xs={6} md={12}>
-          <Item style={{ height: '5rem', 
-            backgroundColor: '#0d2135', borderRadius: '0.5rem',
-            marginLeft: '1rem' 
-             }}>
+          <Grid xs={6} md={12}>
+            <Item style={{ height: '5rem', 
+              backgroundColor: '#0d2135', borderRadius: '0.5rem',
+              marginLeft: '1rem' 
+              }}>
          
-         <p style={{fontSize: '0.8rem', 
-                       textAlign: 'left',  
-                       paddingTop: '0.5rem', 
-                       paddingLeft:'2rem', 
-                       paddingRight: '4.5rem', 
-                       paddingBottom: '0.5rem', 
-                       fontFamily: 'Poppins'}}> 
-                       
-                       WEEKLY FORECAST </p> 
-
-                       <div>
-              {/* Render content based on selected option */}
-              {currentChart === 'TEMPERATURE' && <TemperatureNext />}
-              {currentChart === 'TURBIDITY' && <TurbidityNext />}
-              {currentChart === 'PH' && <PhNext />}
+            <p style={{   fontSize: '1.5rem', 
+                          textAlign: 'left',  
+                          paddingTop: '0.5rem', 
+                          paddingLeft:'2rem', 
+                          paddingRight: '4.5rem', 
+                          paddingBottom: '0.5rem', 
+                          fontFamily: 'Sk-Modernist-Regular'}}> 
+                          
+                          WEEKLY FORECAST 
+            </p>
+              <div>
+              {currentChart === 
+              'TEMPERATURE' && <TemperatureNext />}
+              {currentChart === 
+              'TURBIDITY' && <TurbidityNext />}
+              {currentChart === 
+              'PH' && <PhNext />}
             </div>
           </Item>
         </Grid>
-        </Grid>
-
+       </Grid>
       </Grid>
     </div>
   )
 }
-
 export default AnalyticMain

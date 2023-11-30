@@ -2,9 +2,10 @@ const TemperatureReading = require('../models/temperatureModel')
 const TurbidityReading = require('../models/turbidityModel')
 const phLevelReading = require('../models/phLevelModel')
 const DataModel = require('../models/accuracyRateData')
+const AccuracyRate = require('../models/accuracyRateData')
+const IndexModel = require('../models/indexModel')
 
-
-  const allParameters = async (req, res) => {
+const allParameters = async (req, res) => {
     try {
       const latestTemperatures = await TemperatureReading.aggregate([
         // Group the readings by parameter_name and return the latest reading for each group
@@ -38,8 +39,13 @@ const DataModel = require('../models/accuracyRateData')
   
       // Combine the latest readings from each model into a single array
       const latestReadings = latestTemperatures.map(temperature => {
-                const turbidity = latestTurbidities.find(turbidity => turbidity._id === turbidity._id);
-                const phLevel = latestPhLevels.find(phLevel => phLevel._id === phLevel._id);
+                const turbidity = latestTurbidities.find(turbidity => 
+                    turbidity._id === turbidity._id
+                  );
+
+                const phLevel = latestPhLevels.find(phLevel => 
+                    phLevel._id === phLevel._id
+                  );
         return {
           _id: temperature._id,
           parameter_name: [temperature._id, turbidity._id, phLevel._id],
@@ -55,19 +61,25 @@ const DataModel = require('../models/accuracyRateData')
     } catch (error) {
       res.status(500).json({ message: 'Cannot get all the request' });
     }
-  }
+}
 
 
-  const getAllParameters = async (req, res) => {
+const getAllParameters = async (req, res) => {
     try {
       // Fetch the latest temperature reading and status
-      const latestTemperature = await TemperatureReading.findOne().sort({ createdAt: -1 }).select('temperature_value status');
+      const latestTemperature = await TemperatureReading.findOne()
+                                    .sort({ createdAt: -1 })
+                                    .select('temperature_value status');
       
       // Fetch the latest turbidity reading and status
-      const latestTurbidity = await TurbidityReading.findOne().sort({ createdAt: -1 }).select('ntu_value status');
+      const latestTurbidity = await TurbidityReading.findOne()
+                                  .sort({ createdAt: -1 })
+                                  .select('ntu_value status');
       
       // Fetch the latest pH level reading and status
-      const latestPhLevel = await phLevelReading.findOne().sort({ createdAt: -1 }).select('ph_value status');
+      const latestPhLevel = await phLevelReading.findOne()
+                                .sort({ createdAt: -1 })
+                                .select('ph_value status');
   
       // Combine the latest readings from each model into a single array
       const latestReadings = [
@@ -93,80 +105,62 @@ const DataModel = require('../models/accuracyRateData')
     } catch (error) {
       res.status(500).json({ message: 'Cannot get all the request' });
     }
-  }
+}
 
 
-  // const barParameters = async (req, res) => {
-  //   const parameters = {};
-
-  //   try {
-  //     const temperatures = await TemperatureReading.find();
-  //     const highTemperatures = await TemperatureReading.find([
-  //       {
-  //         $match: {
-  //           temperature_value: { $gt: 25, $lt: 0 }
-  //         }
-  //       }
-  //     ]);
-  
-  //     const pHs = await phLevelReading.find();
-  //     const highpHs = await phLevelReading.aggregate([
-  //       {
-  //         $match: {
-  //           ph_value: { $lt: 7, $gt: 8.5 }
-  //         }
-  //       }
-  //     ]);
-  
-  //     const turbidities = await TurbidityReading.find();
-  //     const highTurbidities = await TurbidityReading.aggregate([
-  //       {
-  //         $match: {
-  //           ntu_value: { $gt: 5 }
-  //         }
-  //       }
-  //     ]);
-  
-  //     const parameters = {
-  //       temperature: {
-  //         data: temperatures,
-  //         highValues: highTemperatures
-  //       },
-  //       pH: {
-  //         data: pHs,
-  //         highValues: highpHs
-  //       },
-  //       turbidity: {
-  //         data: turbidities,
-  //         highValues: highTurbidities
-  //       }
-  //     };
-  
-  //     res.status(200).json(parameters);
-  
-  //   } catch (error) {
-  //     return res.status(500).json({
-  //       message: 'Fetching parameters failed!',
-  //       error: error
-  //     });
-  //   }  
-  // };
-  
-  const saveAccuracyRate = async (req, res) => {
+const saveAccuracyRate = async (req, res) => {
     try {
+      // Check if data for this date already exists
+      const existingData = await DataModel.findOne({ timestamp: req.body.timestamp });
+
+      // If data exists, don't save again
+      if (existingData) {
+          return res.status(409).send({ message: 'Data for this date already exists' });
+      }
+
+      // Otherwise, save the new data
       const accuracyData = new DataModel({
-        timestamp: req.body.timestamp,
-        temperature: req.body.temperature,
-        turbidity: req.body.turbidity,
-        pH: req.body.pH
-    });
-    await accuracyData.save();
-    
-        res.status(200).send({ message: 'Data saved successfully' });
+          timestamp: req.body.timestamp,
+          temperature: req.body.temperature,
+          turbidity: req.body.turbidity,
+          pH: req.body.pH
+      });
+      await accuracyData.save();
+      res.status(200).send({ message: 'Data saved successfully' });
     } catch (error) {
         res.status(500).send({ message: 'Error saving data', error });
     }
-  }
+}
+
+
+const fetchAccuracyData = async (req, res) => {
+    try {
+      // Use the find method to retrieve data from the AccuracyRate model
+      const data = await AccuracyRate.find({}).sort({timestamp: -1})
+  
+      // Check if data was found
+      if (data.length === 0) {
+        return res.status(404).send({ message: 'No data found' });
+      }
+  
+      // If data is found, send it as a response
+      res.status(200).send(data);
+    } catch (error) {
+      // Handle any errors that occur during the fetch operation
+      res.status(500).send({ message: 'Error fetching data', error });
+    }
+};
+
+const saveIndex = async (req, res) => {
+    try {
+      const { index, interpretation } = req.body;
+      const newIndex = new IndexModel({ index, interpretation, timestamp: new Date() });
+      await newIndex.save();
+      res.status(200).send({ message: 'Data saved successfully!' });
+    } catch (error) {
+      res.status(500).send({ error: 'Failed to save data.' });
+    }
+};
   
   
-  module.exports = { allParameters, getAllParameters, saveAccuracyRate}
+module.exports = { allParameters, getAllParameters, saveAccuracyRate, saveIndex, fetchAccuracyData }

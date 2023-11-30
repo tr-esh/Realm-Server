@@ -3,8 +3,6 @@ const TurbidityReading = require('../models/turbidityModel');
 const phLevelReading = require('../models/phLevelModel');
 
 
-
-
 const calculateAverage = async (req, res) => {
     try {
       const [temp, turbid, phlevel] = await Promise.all([
@@ -60,8 +58,6 @@ const calculateAverage = async (req, res) => {
     res.status(500).json({ message: 'Cannot get all the request' });
   }
 }
-  
-  
   
 
 module.exports = { calculateAverage };

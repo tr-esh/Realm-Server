@@ -253,11 +253,12 @@ const cron = require('node-cron'); //for periodic running of processes
       }
     };
 
-    // Schedule fetchDataAndTrain for all metrics to run daily at 3:00 AM
-    cron.schedule('0 3 */3 * *', updatePredictionsIfNecessary);
-    // Schedule predictValues for all metrics to run every half hour
-    cron.schedule('0 0 */3 * *', predictValuesForAllMetrics);
-
+    const scheduleDataJobs = () => {
+      // Schedule fetchDataAndTrain for all metrics to run daily at 3:00 AM
+      cron.schedule('0 3 */3 * *', updatePredictionsIfNecessary);
+      // Schedule predictValuesForAllMetrics to run at 3AM, 9AM, 3PM and 9PM
+      cron.schedule('0 3,9,15,21 * * *', predictValuesForAllMetrics);
+    };
 
 
 
@@ -292,5 +293,5 @@ const cron = require('node-cron'); //for periodic running of processes
     // }
 
 
-module.exports = { predictValues }
+module.exports = { predictValues, scheduleDataJobs }
 

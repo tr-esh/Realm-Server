@@ -7,7 +7,7 @@ const PhLevelChart = () => {
   useEffect(() => {
     const fetchPhData = async () => {
       try {
-        const response = await fetch('/api/realm/getph'); // Replace with your API endpoint
+        const response = await fetch('/api/realm/getph');
         const data = await response.json();
         
 
@@ -58,21 +58,30 @@ const PhLevelChart = () => {
   }, []);
 
   const tooltipStyle = {
-    fontFamily: 'Poppins', // Replace with the desired font family
+    fontFamily: 'Sk-Modernist-Regular', 
     fontSize: '0.9rem',
     fontWeight: '500',
-    backgroundColor: '#0d2135',
-    border: 'none'
+    border: 'none',
+    color: 'white'
   };
   
   
   return (
-    <div  style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+    <div  style={{ width: '100%', 
+                   height: '100%', 
+                   display: 'flex', 
+                   justifyContent: 'center', 
+                   alignItems: 'center'}}>
     <ResponsiveContainer>
       <LineChart data={phData}>
         <XAxis dataKey="date" />
         <Tooltip contentStyle={tooltipStyle} />
-        <Line type="monotone" dataKey="ph_value" name="pH Level" stroke="#F5D087" strokeWidth={3} dot={{ r: 3 }} />
+        <Line type="monotone" 
+              dataKey="ph_value" 
+              name="pH Level" 
+              stroke="#09111c" 
+              strokeWidth={3} 
+              dot={{ r: 3 }} />
       </LineChart>
       </ResponsiveContainer>
     </div>

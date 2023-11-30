@@ -3,7 +3,7 @@ import '../../styles/SingleMetric.css';
 import TollRoundedIcon from '@mui/icons-material/TollRounded';
 
 const PhNext = () => {
-  const [predictions, setPredictions] = useState([]); // Initialize as an empty array
+  const [predictions, setPredictions] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -17,20 +17,16 @@ const PhNext = () => {
             value: item.values.value,
             timestamp: item.values.timestamp
           }));
-
-          // Append the new data to the existing predictions
-          setPredictions(prevPredictions => [
-            ...prevPredictions,
-            ...formattedData
-          ]);
-
-          // Keep only the 5 most recent predictions
-          setPredictions(prevPredictions =>
-            prevPredictions.slice(-5)
-          );
-        } else {
+      
+          // Append the new data to the existing predictions and then filter the last 5
+          setPredictions(prevPredictions => {
+            const updatedPredictions = [...prevPredictions, ...formattedData];
+            return updatedPredictions.slice(-5);  // Keep only the 5 most recent predictions
+          });
+      
+      } else {
           setError('Prediction data is not available.');
-        }
+      }      
       } catch (error) {
         console.error(error);
         setError('An error occurred while fetching data.');
@@ -49,8 +45,10 @@ const PhNext = () => {
       <div className="predictions-container">
         {predictions.length > 0 ? (
           predictions.map((predict, index) => (
-            <div key={index} className="prediction" style={{ margin: 'auto' }}>
-                <TollRoundedIcon style={{ color: '#F5D087' }} />
+            <div key={index} 
+                 className="prediction" 
+                 style={{ margin: 'auto' }}>
+                <TollRoundedIcon style={{ color: '#8cacff' }} />
               <p className='Results'>{parseFloat(predict.value).toFixed(2)}</p>
               <p className='Days'>{formatDate(predict.timestamp)}</p>
             </div>

@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const AccuracyRate = () => {
+
     const [progress, setProgress] = useState({
-      temperature: 0,
-      turbidity: 0,
-      pH: 0,
+        temperature: 0,
+        turbidity: 0,
+        pH: 0,
     });
 
     const [accuracyData, setAccuracyData] = useState({
-      timestamp: '',
-      temperature: 0,
-      turbidity: 0,
-      pH: 0,
+        timestamp: '',
+        temperature: 0,
+        turbidity: 0,
+        pH: 0,
     });
 
     const sendDataToBackend = async () => {
@@ -24,17 +26,22 @@ const AccuracyRate = () => {
                 body: JSON.stringify(accuracyData)
             });
             const data = await response.json();
-            console.log(data.message);
+
+            if(response.status === 409) { 
+                console.warn(data.message);
+            } else {
+                console.log(data.message);
+            }
         } catch (error) {
             console.error('Error sending data:', error);
         }
     };
 
     useEffect(() => {
-      if (accuracyData.timestamp) { // To avoid sending the initial empty state
-          console.log("Sending accuracy data:", accuracyData);
-          sendDataToBackend();
-      }
+        if (accuracyData.timestamp) { // To avoid sending the initial empty state
+            console.log("Sending accuracy data:", accuracyData);
+            sendDataToBackend();
+        }
     }, [accuracyData]);
 
     useEffect(() => {
@@ -71,7 +78,6 @@ const AccuracyRate = () => {
 
         fetchData();
     }, []);
-  
     const getMostFrequentValue = (data, type) => {
       let valueField;
       switch (type) {
@@ -111,18 +117,31 @@ const AccuracyRate = () => {
   const fetchPredictedValueAndCalculateAccuracy = async (metricType, actualValue, formattedYesterday) => {
     const response = await fetch(`/api/realm/predictnext/${metricType}`);
     const predictionsArray = await response.json();
-    let predictedValueForDate;
 
-    const predictionForDate = predictionsArray.find(prediction => {
-        const predictionDate = new Date(prediction.values.timestamp);
-        return `${predictionDate.getFullYear()}-${String(predictionDate.getMonth() + 1).padStart(2, '0')}-${String(predictionDate.getDate()).padStart(2, '0')}` === formattedYesterday;
+    const predictionsForDate = predictionsArray.filter(prediction => {
+        // First convert the string timestamp to a Date object
+        const predictionDateUTC = new Date(prediction.values.timestamp);
+        
+        const predictionDate = new Date(Date.UTC(
+            predictionDateUTC.getUTCFullYear(), 
+            predictionDateUTC.getUTCMonth(), 
+            predictionDateUTC.getUTCDate()
+        ));
+        
+        const formattedUTCDate = `${predictionDate.getUTCFullYear()}-${String(predictionDate.getUTCMonth() + 1).padStart(2, '0')}-${String(predictionDate.getUTCDate()).padStart(2, '0')}`;
+        
+        return formattedUTCDate === formattedYesterday;
     });
 
-    if (predictionForDate) {
-        predictedValueForDate = predictionForDate.values.value;
-    } else {
+    if (!predictionsForDate.length) {
         console.error(`No prediction found for date: ${formattedYesterday}`);
+        return 0;  // Or a suitable default value.
     }
+
+    predictionsForDate.sort((a, b) => new Date(b.values.timestamp) - new Date(a.values.timestamp));
+    
+    const predictedValueForDate = predictionsForDate[0].values.value;
+
 
     return calculateAccuracy(predictedValueForDate, actualValue);
 };
@@ -158,25 +177,40 @@ const calculateAccuracy = (predicted, actual) => {
 
 
   
-    const generateProgressBar = (paramProgress, paramName) => {
-      const filledWidth = (paramProgress / 100) * 100 + '%';
-      const progressBarStyle = {
-        width: '100%',
-        height: '0.3rem',
-        background: `linear-gradient(to right, #4E79B4 ${filledWidth}, #0d2135 ${filledWidth})`,
-        borderRadius: '2rem'
-      };
-  
-      return (
-        <div key={paramName}>
-          <p style={{ fontSize: '0.8rem', paddingLeft: '0.5rem', paddingTop: '0.5rem'  ,textTransform: 'uppercase', fontWeight: '500', color: '#C7C7C7' }}>{paramName}</p>
+const generateProgressBar = (paramProgress, paramName) => {
+    const filledWidth = (paramProgress / 100) * 100 + '%';
+    const progressBarStyle = {
+      width: '100%',
+      height: '0.3rem',
+      background: `linear-gradient(to right, #8cacff ${filledWidth}, #0d2135 ${filledWidth})`,
+      borderRadius: '2rem'
+    };
+
+    return (
+      <Link to={`/AssessMain/${paramName.toLowerCase()}`} key={paramName} style={{ textDecoration: 'none' }}>
+        <div style={{ cursor: 'pointer' }}>
+          <p style={{ fontSize: '0.8rem', 
+                      paddingLeft: '0.5rem', 
+                      paddingTop: '0.5rem',
+                      textTransform: 'uppercase', 
+                      fontWeight: '500', 
+                      color: '#C7C7C7',
+                      fontFamily: 'Sk-Modernist-Regular' }}>
+            {paramName}
+          </p>
           <div className="progress-bar" style={{ padding: '1rem' }}>
             <div className="progress-bar-fill" style={progressBarStyle}></div>
-            <div className="progress-bar-label" style={{ fontSize: '0.8rem', paddingTop: '0.5rem', color: '#4B6075' }}>{`${paramProgress}% accuracy of 100`}</div>
+            <div className="progress-bar-label" 
+                 style={{ fontSize: '0.8rem',
+                          paddingTop: '0.5rem', 
+                          color: '#4B6075' }}>
+                         {`${paramProgress}% accuracy of 100`}
+            </div>
           </div>
         </div>
-      );
-    }
+      </Link>
+    );
+  }
   
     return (
       <div>

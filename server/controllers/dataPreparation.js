@@ -82,7 +82,7 @@ const cron = require('node-cron'); //for periodic running of processes
           tfModel.add(tf.layers.lstm({ units: 128, returnSequences: true, inputShape: [sequenceLength, 1] }));
           tfModel.add(tf.layers.lstm({ units: 64, returnSequences: true }));
           tfModel.add(tf.layers.lstm({ units: 32, returnSequences: false }));
-          tfModel.add(tf.layers.dense({ units: 9 }));
+          tfModel.add(tf.layers.dense({ units: 12 }));
 
           tfModel.compile({ loss: 'meanSquaredError', optimizer: 'rmsprop' });
         }
@@ -97,17 +97,17 @@ const cron = require('node-cron'); //for periodic running of processes
 
         let sequences = [];
         let labels = [];
-        for (let i = 0; i < trainingData.length - sequenceLength - 9; i++) {
-          let sequence = trainingData.slice(i, i + sequenceLength);
-          let label = trainingData.slice(i + sequenceLength, i + sequenceLength + 9);
-          if (sequence.length === sequenceLength && label.length === 9) {
-            sequences.push(sequence.map(value => [value]));
-            labels.push(label);
-          }
+        for (let i = 0; i < trainingData.length - sequenceLength - 12; i++) {
+            let sequence = trainingData.slice(i, i + sequenceLength);
+            let label = trainingData.slice(i + sequenceLength, i + sequenceLength + 12);
+            if (sequence.length === sequenceLength && label.length === 12) {
+                sequences.push(sequence.map(value => [value]));
+                labels.push(label);
+            }
         }
 
         const xs = tf.tensor3d(sequences, [sequences.length, sequenceLength, 1]);
-        const ys = tf.tensor2d(labels, [labels.length, 9]);
+        const ys = tf.tensor2d(labels, [labels.length, 12]);
 
         await tfModel.fit(xs, ys, {
           batchSize: 32,
@@ -126,7 +126,7 @@ const cron = require('node-cron'); //for periodic running of processes
         const output = tfModel.predict(inputData);
         output.print();
 
-        return true;
+        return true; 
 
       } catch (err) {
         console.error('Failed to fetch data or train the model.', err);
@@ -136,31 +136,27 @@ const cron = require('node-cron'); //for periodic running of processes
 
 
     const savePredictionsToDB = async (metricType, predictions) => {
-
-      // Extracting only the 'value' property from each object in the predictions array
-      const valuesArray = predictions.map(prediction => prediction.value);
-
       const prediction = new PredictionsModel({
           metricType: metricType,
-          timestamp: new Date(),
-          values: valuesArray
+          values: predictions
       });
-
-      await prediction.save();
+    
+        await prediction.save();
     };
+  
 
-  const getCurrentAndFutureTimes = () => {
-    const now = new Date();
-    now.setHours(now.getHours(), (now.getMinutes() >= 30 ? 60 : 0), 0, 0);
-    const times = [now];
-
-    for (let i = 1; i <= 8; i++) { // Adjust the loop to iterate 8 times instead of 4
-      const futureTime = new Date(now);
-      futureTime.setHours(now.getHours() + 2 * i);
-      times.push(futureTime);
-    }
-
-    return times.map(time => `${time.getHours()}:00`);
+    const getCurrentAndFutureTimes = () => {
+      const now = new Date();
+      now.setHours(now.getHours(), (now.getMinutes() >= 30 ? 60 : 0), 0, 0);
+      const times = [now];
+  
+      for (let i = 1; i <= 11; i++) {
+          const futureTime = new Date(now);
+          futureTime.setHours(now.getHours() + 2 * i);
+          times.push(futureTime);
+      }
+  
+      return times;
   }
 
 
@@ -191,26 +187,24 @@ const cron = require('node-cron'); //for periodic running of processes
 
           const output = tfModel.predict(inputData);
           const predictionsArray = output.arraySync()[0];
-
           const futureTimes = getCurrentAndFutureTimes();
 
-          // Save the predictions with corresponding future times
-          const predictionsWithTimes = futureTimes.map((time, index) => {
+          // Create an array of objects with both value and timestamp
+          const predictionsWithTimestamps = futureTimes.map((timestamp, index) => {
               return {
-                  time: time,
+                  timestamp: timestamp,
                   value: predictionsArray[index]
               };
           });
 
-          await savePredictionsToDB(metricType, predictionsWithTimes);
-
-          return predictionsWithTimes;
+          await savePredictionsToDB(metricType, predictionsWithTimestamps);
+          return predictionsWithTimestamps;
 
       } catch (err) {
           console.error('Failed to fetch data or make prediction.', err);
           return [];
       }
-    };
+      };
 
     const fetchDataAndTrainAllMetrics = async () => {
       try {
@@ -232,15 +226,16 @@ const cron = require('node-cron'); //for periodic running of processes
       }
     };
 
-    // Schedule fetchDataAndTrain for all metrics to run daily at 3:00 AM
-    cron.schedule('0 3 * * *', fetchDataAndTrainAllMetrics);
 
-    // Schedule predictValues for all metrics to run every 5 minutes
-    cron.schedule('*/30 * * * *', () => {
-      console.log('Cron job triggered!');
-      predictValuesForAllMetrics();
-    });
-
+    const scheduleDataJobs = () => {
+      // Schedule fetchDataAndTrain for all metrics to run daily at 3:00 AM
+      cron.schedule('0 3 * * *', fetchDataAndTrainAllMetrics);
+      // Schedule predictValues for all metrics to run every 5 minutes
+      cron.schedule('*/30 * * * *', () => {
+        console.log('Cron job triggered!');
+        predictValuesForAllMetrics();
+      });
+    };
 
 
     // const main = async () => {
@@ -272,5 +267,5 @@ const cron = require('node-cron'); //for periodic running of processes
 
 
 
-module.exports = { predictValues }
+module.exports = { predictValues, scheduleDataJobs }
 
